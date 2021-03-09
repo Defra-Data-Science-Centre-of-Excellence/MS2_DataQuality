@@ -12,3 +12,8 @@ def create_geojson_metadata(file) -> tuple:
     header_list = headers_list[0]
     num_rows = int(num_rows[0])
     return header_list, num_rows
+
+
+def create_geojson_data_quality_report(file):
+    # TODO build sprint 4
+    pass

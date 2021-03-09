@@ -16,10 +16,3 @@ def create_gpkg_metadata(file) -> tuple:
 def create_gpkg_data_quality_report(file):
     # TODO build sprint 4
     pass
-
-
-if __name__ == "__main__":
-    layers, headers_list, num_rows = create_gpkg_metadata("C:/Users/beellis/Desktop/bdline_gb.gpkg")
-    print(layers)
-    print(headers_list)
-    print(num_rows)

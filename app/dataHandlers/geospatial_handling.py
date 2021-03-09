@@ -33,7 +33,6 @@ def create_geospatial_metadata(file, type: str) -> tuple:
     for layer in all_layers:
         layers.append(layer)
         gdf = geopandas.read_file(file, layer = layer)
-        print(gdf)
         gdf_col = [col for col in gdf.columns]
         headers_list.append(gdf_col)
         num_rows.append(len(gdf))
