@@ -6,8 +6,11 @@ args = main_aux.parse_args()
 mode = args.mode
 configPath = args.config
 
+logger = main_aux.create_logger()
+
 # Load config file
-config = main_aux.load_json
+logger.info("Loading config file...")
+config = main_aux.load_json_file(args.config)
 
 # Connect to S3
 

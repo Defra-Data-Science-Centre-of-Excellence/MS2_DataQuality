@@ -4,8 +4,21 @@ import sys
 import logging
 
 
-def create_logger():
-    pass
+def create_logger(log_level=logging.INFO):
+    """
+    Function to create a logger object for use in the script
+    :param object log_level: logger.[LEVEL] object to set the default level of the logs to display
+    :return object logger: Standard python logging object
+    """
+    logger = logging.getLogger("elmsMetadataDQTool")
+    formatter = logging.Formatter(f"[%(asctime)s] - [%(name)s] - [%(levelname)s] - %(message)s")
+    handler = logging.StreamHandler()
+    handler.setLevel(log_level)
+    handler.setFormatter(formatter)
+    logger.setLevel(log_level)
+    logger.addHandler(handler)
+    logger.propagate = False
+    return logger
 
 
 def parse_args():
