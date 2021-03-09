@@ -12,7 +12,7 @@ from os.path import dirname
 
 def get_corresponding_dataset_files(bucket: str,
                                     manifest_file: str
-                                    ) -> None:
+                                    ) -> list:
     """
     List out corresponding datast files for passed manifest file
     :param bucket: bucket the manifest file is in e.g. "elms-test-1"
@@ -47,6 +47,7 @@ def get_corresponding_dataset_files(bucket: str,
             # loop through evey item in a page
             for object in entry:
                 print(object)
+        return contents
     except KeyError:
         print("ERROR: got no dataset files for manifest file {}".format(manifest_file))
 
