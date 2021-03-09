@@ -1,5 +1,4 @@
-import geopandas
-import fiona
+from app.dataHandlers.geospatial_handling import create_geospatial_metadata
 
 
 def create_gpkg_metadata(file) -> tuple:
@@ -11,22 +10,16 @@ def create_gpkg_metadata(file) -> tuple:
                             layer name in layers at the same index
              num_rows - a list where the index of the layer is the number of rows that layer has
     """
-
-    layers = []
-    headers_list = []
-    num_rows = []
-
-    for layer in fiona.listlayers(file):
-        layers.append(layer)
-        gdf = geopandas.read_file(file, layer = layer)
-
-        gdf_col = [col for col in gdf.columns]
-        headers_list.append(gdf_col)
-        num_rows.append(len(gdf))
-
-    return layers, headers_list, num_rows
+    return create_geospatial_metadata(file, type = "gpkg")
 
 
 def create_gpkg_data_quality_report(file):
     # TODO build sprint 4
     pass
+
+
+if __name__ == "__main__":
+    layers, headers_list, num_rows = create_gpkg_metadata("C:/Users/beellis/Desktop/bdline_gb.gpkg")
+    print(layers)
+    print(headers_list)
+    print(num_rows)
