@@ -1,0 +1,5 @@
+{
+  "buckets_to_read": ["s3://elms-test-1", "s3://elms-test-2"],
+  "bucket_directory_to_write_to": "s3://elms-test-1/",
+  "aws_credentials_json_location": ""
+}
