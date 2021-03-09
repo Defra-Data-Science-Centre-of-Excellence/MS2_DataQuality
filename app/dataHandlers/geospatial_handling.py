@@ -24,17 +24,20 @@ def create_geospatial_metadata(file, type: str) -> tuple:
     elif type == "gpkg":
         all_layers = fiona.listlayers(file)
     else:
-        raise ValueError("File format {} not recognised, at present only GEOjson and gpkg files formats are supported".format(type))
-
+        raise ValueError(f"File format {type} not recognised , at present only GEOjson and gpkg files formats are supported")
     layers = []
     headers_list = []
     num_rows = []
 
     for layer in all_layers:
-        layers.append(layer)
-        gdf = geopandas.read_file(file, layer = layer)
-        gdf_col = [col for col in gdf.columns]
-        headers_list.append(gdf_col)
-        num_rows.append(len(gdf))
+        try:
+            gdf = geopandas.read_file(file, layer = layer)
+            layers.append(layer)
+            gdf_col = [col for col in gdf.columns]
+            headers_list.append(gdf_col)
+            num_rows.append(len(gdf))
+        except:
+            # this except clause is too broad
+            print(f"ERROR: couldn't load layer {layer}")
 
     return layers, headers_list, num_rows
