@@ -43,6 +43,8 @@ class Crawler(object):
                 if created_dataset_metadata is None:
                     print(f"WARNING: unable to create some metadata for dataset file {dataset_file['Key']}")
                 else:
+                    for entry in created_dataset_metadata:
+                        print(entry)
                     # here we need to combine the created metdata and the manifest metdata
                     pass
 
@@ -112,6 +114,6 @@ class Crawler(object):
 
 
 if __name__ == "__main__":
-    bucket = "elms-test-2"
+    bucket = "elms-test-1"
     c = Crawler(credentials_fp = "C:/Users/beellis/aws_creds.json")
     c.create_metadata_for_bucket(bucket = bucket)

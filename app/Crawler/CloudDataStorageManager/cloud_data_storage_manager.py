@@ -116,9 +116,9 @@ class CloudDataStorageManager(object):
 
     def read_file_from_storage(self, bucket: str, key: str) -> str:
         """
-
-        :param bucket:
-        :param key:
+        Read a file from S3 storage
+        :param bucket: bucket the file is in
+        :param key: the location of the file in the bucket
         :return: FLO object
         """
         obj = self._client.get_object(Bucket = bucket, Key = key)
