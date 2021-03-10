@@ -119,10 +119,9 @@ class CloudDataStorageManager(object):
         Read a file from S3 storage
         :param bucket: bucket the file is in
         :param key: the location of the file in the bucket
-        :return: FLO object
+        :return: bytes
         """
         obj = self._client.get_object(Bucket = bucket, Key = key)
-        # return obj['Body'].read().decode('utf-8')
         return obj['Body'].read()
 
     @lru_cache(maxsize = 2)

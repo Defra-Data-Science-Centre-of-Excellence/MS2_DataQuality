@@ -48,12 +48,22 @@ class Crawler(object):
                 if created_dataset_metadata is None:
                     print(f"WARNING: unable to create some metadata for dataset file {dataset_file['Key']}")
 
+
                 else:
 
-                    for entry in created_dataset_metadata:
-                        print(entry)
                     # here we need to combine the created metdata and the manifest metdata
                     pass
+                # So here is where we need to combine:
+                #   - the manifest file, variable: manifest_file - a dictionary format of the manifest file
+                #   - aws metadata (e.g. datetime last updated, file_size), variable: dataset_file - a dictionary
+                #   - the metadata we create by parsing, variable: created_dataset_metadata - a list of lists
+                #     If the dataset file has layers the created_dataset_metadata looks like [layers, headers_list, num_rows]
+                #     where layers is a list of lists with every entry being the name of the layaer, headers_list is
+                #     is a list of lists where each list contains the headers for the layer at the same index and num rows
+                #     is a list of the number of rows.
+                #     If the dataset files doesn't have layers (i.e. geojson or csv) the created_dataset_metadata looks like
+                #     [header_list, num_rows] where header_list is a list of the headers and num_rows is an integer, the
+                #     number of rows
 
     def create_metadata_for_buckets(self, buckets: list) -> None:
         """
@@ -84,7 +94,7 @@ class Crawler(object):
         :return: list - of layers (optional depending on format), headers, and number of rows, if the file can't be parse
                         None is returned
         """
-        shape_file_formats = [".shp", ".shx", ".shb"]
+        shape_file_formats = [".shp", ".shx", ".shb", ".cpg", ".dbf", ".prj", ".sbn", ".sbx", ".shp.xml"]
         _, dataset_file_extension = splitext(dataset_file["Key"])
         dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
 
