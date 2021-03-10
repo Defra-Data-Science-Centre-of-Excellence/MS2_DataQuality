@@ -2,7 +2,6 @@
 TODO
     - Check assumption: passing a json credentials file
     - Implement upload functionality
-    - Test get manifest file functionaltiy
     - implement _load_manifest_file for json
     - what happens if you try to acesss a bucket that doesn't exist, this should be auidted
     - docstrings
@@ -115,7 +114,7 @@ class CloudDataStorageManager(object):
             else:
                 print(f"WARNING: no manifest file found in directory {manifest_directory}")
 
-    def read_file_from_storage(self, bucket: str, key: str) -> str:
+    def read_file_from_storage(self, bucket: str, key: str) -> bytes:
         """
         Read a file from S3 storage
         :param bucket: bucket the file is in
@@ -123,15 +122,17 @@ class CloudDataStorageManager(object):
         :return: FLO object
         """
         obj = self._client.get_object(Bucket = bucket, Key = key)
-        return obj['Body'].read().decode('utf-8')
+        # return obj['Body'].read().decode('utf-8')
+        return obj['Body'].read()
 
     @lru_cache(maxsize = 2)
     def _load_manifest_file(self, bucket: str, key: str) -> dict:
         """
-
-        :param bucket:
-        :param key:
-        :return: dict
+        Load manifest file into memory as dictionary
+        Note: using caching to reduce repeated calls to server for the same manifest file
+        :param bucket: bucket the manifest is in
+        :param key: the location of the manifest file in the bucket
+        :return: dict - the manifest as a python native dictionary
         """
         manifest_flo = self.read_file_from_storage(bucket = bucket, key = key)
         return json.loads(manifest_flo)
@@ -146,3 +147,4 @@ class CloudDataStorageManager(object):
 if __name__ == "__main__":
     cdsm = CloudDataStorageManager(credentials_fp = "C:/Users/beellis/aws_creds.json")
     dataset_file = cdsm.get_dataset_files_list(bucket = "elms-test-1")
+    print()
