@@ -41,7 +41,7 @@ class Crawler(object):
             else:
                 created_dataset_metadata = self._create_dataset_file_metadata(bucket = bucket, dataset_file = dataset_file)
                 if created_dataset_metadata is None:
-                    print(f"WARNING: unable to create some metdata for dataset file {dataset_file['Key']}")
+                    print(f"WARNING: unable to create some metadata for dataset file {dataset_file['Key']}")
                 else:
                     # here we need to combine the created metdata and the manifest metdata
                     pass
