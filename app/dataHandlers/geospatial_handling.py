@@ -37,7 +37,8 @@ def create_geospatial_metadata(file, type: str) -> tuple:
         all_layers = fiona.listlayers(local_name)
         file = local_name
     else:
-        raise ValueError(f"File format {type} not recognised , at present only GEOjson and gpkg files formats are supported")
+        raise ValueError(f"File format {type} not recognised , at present only GEOjson and gpkg file formats "
+                         f"are supported")
     layers = []
     headers_list = []
     num_rows = []

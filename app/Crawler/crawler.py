@@ -10,6 +10,7 @@ from app.dataHandlers import *
 from os.path import dirname, splitext
 from typing import Union
 import time
+import pandas as pd
 
 
 class Crawler(object):
@@ -38,6 +39,7 @@ class Crawler(object):
             dataset_dir_name = dirname(dataset_file["Key"]).split("/")[0]
             manifest_directory = f"{dataset_dir_name}/manifest/"
             manifest_file = self._cdsm.get_manifest_file(bucket = bucket, manifest_directory = manifest_directory)
+            csv_data = []
 
             if manifest_file is None:
                 print(f"ERROR: no manifest file returned, creation of metadata file for dataset file {dataset_file['Key']} aborted")
@@ -52,7 +54,29 @@ class Crawler(object):
                 else:
 
                     # here we need to combine the created metdata and the manifest metdata
-                    pass
+                    # TODO tidy up logic & import script companion json
+                    metadata_row = []
+                    for header in output_column_order:
+                        if header in manifest_mappings.keys():
+                            metadata_row.append(manifest_file['header'])
+                        elif header in generated_data_export_mappings.keys():
+                            if header == "file_url":
+                                metadata_row.append(dataset_dir_name)
+                            elif header == "data_last_updated":
+                                metadata_row.append(created_dataset_metadata[])
+                    csv_data.append(metadata_row)
+
+
+            export_columns = []
+            # TODO tidy up with better data structure
+            for col in output_column_order:
+                if col in manifest_mappings.keys():
+                    export_columns.append(manifest_mappings[col])
+                elif col in generated_data_export_mappings.keys():
+                    export_columns.append(generated_data_export_mappings[col])
+            export_df = pd.DataFrame(columns=export_columns)
+            export_df.to_csv()
+
                 # So here is where we need to combine:
                 #   - the manifest file, variable: manifest_file - a dictionary format of the manifest file
                 #   - aws metadata (e.g. datetime last updated, file_size), variable: dataset_file - a dictionary
@@ -91,10 +115,10 @@ class Crawler(object):
 
         :param bucket: bucket the dataset file is in
         :param dataset_file: location of the dataset file in the bucket
-        :return: list - of layers (optional depending on format), headers, and number of rows, if the file can't be parse
-                        None is returned
+        :return: list - of layers (optional depending on format), headers, and number of rows, if the file can't be
+        parsed None is returned
         """
-        shape_file_formats = [".shp", ".shx", ".shb", ".cpg", ".dbf", ".prj", ".sbn", ".sbx", ".shp.xml"]
+        shape_file_formats = [".shp", ".shx", ".shb", ".cpg", ".dbf", ".prj", ".sbn", ".sbx", ".shp.xml"]  # TODO call from script_companion.json
         _, dataset_file_extension = splitext(dataset_file["Key"])
         dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
 
@@ -110,7 +134,8 @@ class Crawler(object):
 
             except:
                 # this except is too broad
-                print(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson formats of json files are currently supported")
+                print(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
+                      f"formats of json files are currently supported")
                 return None
 
         elif dataset_file_extension == ".csv":
