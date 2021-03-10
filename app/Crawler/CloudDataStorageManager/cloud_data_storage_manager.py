@@ -14,6 +14,7 @@ import json
 import re
 from functools import lru_cache
 from typing import Union
+from io import StringIO
 
 
 class CloudDataStorageManager(object):
@@ -122,7 +123,7 @@ class CloudDataStorageManager(object):
         :return: FLO object
         """
         obj = self._client.get_object(Bucket = bucket, Key = key)
-        return obj['Body']
+        return obj['Body'].read().decode('utf-8')
 
     @lru_cache(maxsize = 2)
     def _load_manifest_file(self, bucket: str, key: str) -> dict:
@@ -133,7 +134,7 @@ class CloudDataStorageManager(object):
         :return: dict
         """
         manifest_flo = self.read_file_from_storage(bucket = bucket, key = key)
-        return json.load(manifest_flo)
+        return json.loads(manifest_flo)
 
     def __str__(self):
         return "CloudDataStorageManager Object"

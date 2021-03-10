@@ -7,7 +7,7 @@ def create_csv_metadata(file):
     :param file: File-like object of a CSV file following a '.readlines' conversion
     :return list; int header_list; num_rows:
     """
-    lines = file.read().decode('utf-8').split()
+    lines = file.split()
     reader = csv.reader(lines)
     data = [row for row in reader]
     header_list = data[0]

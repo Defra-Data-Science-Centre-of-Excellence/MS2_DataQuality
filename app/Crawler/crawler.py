@@ -69,7 +69,6 @@ class Crawler(object):
     def _create_dataset_file_metadata(self, bucket: str, dataset_file: dict) -> Union[list, None]:
         """
         Loads file from storage and returns the metadata
-        TODO - how do we return with and without layers
         :return:
         """
         shape_file_formats = [".shp", ".shx", ".shb"]
@@ -88,13 +87,18 @@ class Crawler(object):
                 print(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson formats of json files are currently supported")
                 return None
         elif dataset_file_extension == ".csv":
+            """
+                        try:
+                            header_list, num_rows = create_csv_metadata(file = dataset_file_flo)
+                            return [header_list, num_rows]
+                        except:
+                            # except is too broad
+                            return None
+                        """
             # at present csv handler can't parse the boto3 FLOs
-            try:
-                header_list, num_rows = create_csv_metadata(file = dataset_file_flo)
-                return [header_list, num_rows]
-            except:
-                # except is too broad
-                return None
+            header_list, num_rows = create_csv_metadata(file = dataset_file_flo)
+            return [header_list, num_rows]
+
         elif dataset_file_extension == ".gpkg":
             try:
                 layers, headers_list, num_rows = create_gpkg_metadata(file = dataset_file_flo)
