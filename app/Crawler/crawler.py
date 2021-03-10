@@ -31,6 +31,7 @@ class Crawler(object):
         dataset_files = self._cdsm.get_dataset_files_list(bucket = bucket)
 
         for dataset_file in dataset_files:
+            print(f"Creating metadata file for dataset file {dataset_file['Key']}")
             dataset_dir_name = dirname(dataset_file["Key"]).split("/")[0]
             manifest_directory = f"{dataset_dir_name}/manifest/"
             manifest_file = self._cdsm.get_manifest_file(bucket = bucket, manifest_directory = manifest_directory)
@@ -111,6 +112,6 @@ class Crawler(object):
 
 
 if __name__ == "__main__":
-    bucket = "elms-test-1"
+    bucket = "elms-test-2"
     c = Crawler(credentials_fp = "C:/Users/beellis/aws_creds.json")
     c.create_metadata_for_bucket(bucket = bucket)

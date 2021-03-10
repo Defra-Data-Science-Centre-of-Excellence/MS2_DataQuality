@@ -105,14 +105,14 @@ class CloudDataStorageManager(object):
                         # expected name and extension
                         if count == 2:
                             print(
-                                f"ERROR: could not find manifest file manifest.json in directory {manifest_directory}")
+                                f"WARNING: could not find manifest file manifest.json in directory {manifest_directory}")
 
             # auditing errors for not finding manifest file
             elif len(page['Contents']) > 2:
-                print(f"ERROR: found more than one manifest file in directory {manifest_directory}")
+                print(f"WARNING: found more than one manifest file in directory {manifest_directory}")
 
             else:
-                print(f"ERROR: no manifest file found in directory {manifest_directory}")
+                print(f"WARNING: no manifest file found in directory {manifest_directory}")
 
     def read_file_from_storage(self, bucket: str, key: str) -> str:
         """
