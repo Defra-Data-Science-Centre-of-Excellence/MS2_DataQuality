@@ -1,5 +1,8 @@
 import geopandas
 import fiona
+from uuid import uuid4
+from os.path import exists
+from os import mkdir, remove
 
 
 def create_geospatial_metadata(file, type: str) -> tuple:
@@ -20,21 +23,38 @@ def create_geospatial_metadata(file, type: str) -> tuple:
     """
 
     if type == "GEOjson":
+        # convert bytes to string
         all_layers = [None]
+        file = file.decode("utf-8")
     elif type == "gpkg":
-        all_layers = fiona.listlayers(file)
+        # wrtie out to local temp directory work around
+        if not exists("./temp"):
+            mkdir("./temp")
+        local_name = f"./temp/{uuid4().hex}.gpkg"
+        f = open(local_name, 'wb')
+        f.write(file)
+        f.close()
+        all_layers = fiona.listlayers(local_name)
+        file = local_name
     else:
-        raise ValueError("File format {} not recognised, at present only GEOjson and gpkg files formats are supported".format(type))
-
+        raise ValueError(f"File format {type} not recognised , at present only GEOjson and gpkg files formats are supported")
     layers = []
     headers_list = []
     num_rows = []
 
     for layer in all_layers:
-        layers.append(layer)
-        gdf = geopandas.read_file(file, layer = layer)
-        gdf_col = [col for col in gdf.columns]
-        headers_list.append(gdf_col)
-        num_rows.append(len(gdf))
+        try:
+            gdf = geopandas.read_file(file, layer = layer)
+            layers.append(layer)
+            gdf_col = [col for col in gdf.columns]
+            headers_list.append(gdf_col)
+            num_rows.append(len(gdf))
+        except Exception as e:
+            print(e)
+            # this except clause is too broad
+            print(f"ERROR: couldn't load layer {layer}")
+
+    if type == "gpkg":
+        remove(file)
 
     return layers, headers_list, num_rows
