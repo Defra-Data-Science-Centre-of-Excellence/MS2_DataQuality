@@ -8,8 +8,11 @@ TODO:
 from app.Crawler.CloudDataStorageManager import CloudDataStorageManager
 from app.dataHandlers import *
 from os.path import dirname, splitext
+import os
 from typing import Union
 import time
+import pandas as pd
+from app.main_aux import load_json_file
 
 
 class Crawler(object):
@@ -23,6 +26,8 @@ class Crawler(object):
         Sets up an instance of CloudDataStorageManager interact with S3 buckets
         """
         self._cdsm = CloudDataStorageManager(credentials_fp = credentials_fp)
+        # TODO link this to main script and have companion file passed in as __init__ param
+        self._companion_json = load_json_file(f"{os.getcwd()}/app/script_companion.json")
 
     def create_metadata_for_bucket(self, bucket: str) -> None:
         """
@@ -38,6 +43,7 @@ class Crawler(object):
             dataset_dir_name = dirname(dataset_file["Key"]).split("/")[0]
             manifest_directory = f"{dataset_dir_name}/manifest/"
             manifest_file = self._cdsm.get_manifest_file(bucket = bucket, manifest_directory = manifest_directory)
+            csv_data = []
 
             if manifest_file is None:
                 print(f"ERROR: no manifest file returned, creation of metadata file for dataset file {dataset_file['Key']} aborted")
@@ -52,7 +58,26 @@ class Crawler(object):
                 else:
 
                     # here we need to combine the created metdata and the manifest metdata
-                    pass
+                    metadata_row = []
+                    generated_fields = {"file_url": dataset_dir_name,
+                                        "data_last_updated": "",
+                                        "column_names": "",
+                                        "row_count": "",
+                                        "geo_layers": "",
+                                        "file_size": "",
+                                        "file_extensions": ""}
+                    for k, v in self._companion_json["metadata_columns"]:
+                        if k in manifest_file.keys():
+                            metadata_row.append(manifest_file[k])
+                        elif k in generated_fields.keys():
+                            metadata_row.append(generated_fields[k])
+                    csv_data.append(metadata_row)
+
+            export_columns = self._companion_json["metadata_columns"].values()
+            export_df = pd.DataFrame(columns=export_columns, data=csv_data)
+            # TODO put in check if output folder exists
+            export_df.to_csv(f"{os.getcwd()}/output/elms-metadata.csv")
+
                 # So here is where we need to combine:
                 #   - the manifest file, variable: manifest_file - a dictionary format of the manifest file
                 #   - aws metadata (e.g. datetime last updated, file_size), variable: dataset_file - a dictionary
@@ -91,10 +116,10 @@ class Crawler(object):
 
         :param bucket: bucket the dataset file is in
         :param dataset_file: location of the dataset file in the bucket
-        :return: list - of layers (optional depending on format), headers, and number of rows, if the file can't be parse
-                        None is returned
+        :return: list - of layers (optional depending on format), headers, and number of rows, if the file can't be
+        parsed None is returned
         """
-        shape_file_formats = [".shp", ".shx", ".shb", ".cpg", ".dbf", ".prj", ".sbn", ".sbx", ".shp.xml"]
+        shape_file_formats = [".shp", ".shx", ".shb", ".cpg", ".dbf", ".prj", ".sbn", ".sbx", ".shp.xml"]  # TODO call from script_companion.json
         _, dataset_file_extension = splitext(dataset_file["Key"])
         dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
 
@@ -110,7 +135,8 @@ class Crawler(object):
 
             except:
                 # this except is too broad
-                print(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson formats of json files are currently supported")
+                print(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
+                      f"formats of json files are currently supported")
                 return None
 
         elif dataset_file_extension == ".csv":
