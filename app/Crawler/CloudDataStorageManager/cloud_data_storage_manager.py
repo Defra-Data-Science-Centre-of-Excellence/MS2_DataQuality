@@ -2,23 +2,23 @@
 TODO
     - Check assumption: passing a json credentials file
     - Implement upload functionality
-    - implement _load_manifest_file for json
-    - what happens if you try to acesss a bucket that doesn't exist, this should be auidted
-    - docstrings
-    - verify caching is correct
+    - what happens if you try to acesss a bucket that doesn't exist, this needs to be dealt with
 """
 
 import boto3
+from botocore import errorfactory
 import json
 import re
 from functools import lru_cache
 from typing import Union
-from io import StringIO
 
 
 class CloudDataStorageManager(object):
     """
     CloudDataStorageManager is a class used to handle interactions with AWS S3 buckets
+
+    Note: This class is implemented in a cloud-agnostic manner, all returns are of python native types so to move to a
+    different cloud storage solution for data, only this class would need to be reimplemented
 
     Usage:
 
@@ -48,42 +48,51 @@ class CloudDataStorageManager(object):
                                     )
         self._list_object_paginator = self._client.get_paginator('list_objects')
 
-    def get_dataset_files_list(self, bucket: str) -> list:
+    def get_dataset_files_list(self, bucket: str) -> Union[None, list]:
 
         """
         Get all dataset files in the specified bucket
         :param bucket: Bucket name
         :return: list of dictionaries, with each dictionary containing the file path and additional metadata for a datafile
         """
-
+        # what happens if the bucket doesn't exist? I think the paginate matheod will throw an exception and quit
+        # we need to handle an exceptions here I think
         page_iterator = self._list_object_paginator.paginate(Bucket = bucket)
-        contents = [page['Contents'] for page in page_iterator]
-        dataset_files_to_return = []
+        try:
+            contents = [page['Contents'] for page in page_iterator]
+            dataset_files_to_return = []
 
-        for entry in contents:
-            # loop through evey item in a page
-            for object in entry:
-                # directroies are returned just like files are but they have a size of 0
-                # so here let's only consider files
-                if object["Size"] > 1:
-                    # here we only want to consider the files that are actual dataset files
-                    if re.match(".*\/data\/.*", object["Key"]):
-                        dataset_files_to_return.append(object)
+            for entry in contents:
+                # loop through evey item in a page
+                for object in entry:
+                    # directroies are returned just like files are but they have a size of 0
+                    # so here let's only consider files
+                    if object["Size"] > 1:
+                        # here we only want to consider the files that are actual dataset files
+                        if re.match(".*\/data\/.*", object["Key"]):
+                            dataset_files_to_return.append(object)
+
+                        else:
+                            pass
+
                     else:
                         pass
-                else:
-                    pass
 
-        return dataset_files_to_return
+            return dataset_files_to_return
+
+        except Exception as e:
+            print(f"WARNING: got paginator error for bucket {bucket}")
+            print(e)
+            return None
 
     def get_manifest_file(self,
                           bucket: str,
                           manifest_directory: str) -> Union[None, dict]:
         """
         Method to return the manifest file requested as a FLO
-        :param bucket:
-        :param manifest_directory:
-        :return:
+        :param bucket: bucket the manifest file is in
+        :param manifest_directory: directory the manifest file is in
+        :return: None if the manifest file cannot be found or a dictionary of the manifest file in memory
         """
         page_iterator = self._list_object_paginator.paginate(Bucket = bucket,
                                                              Prefix = manifest_directory)
@@ -119,7 +128,7 @@ class CloudDataStorageManager(object):
         Read a file from S3 storage
         :param bucket: bucket the file is in
         :param key: the location of the file in the bucket
-        :return: bytes
+        :return: bytes - file in memory
         """
         obj = self._client.get_object(Bucket = bucket, Key = key)
         return obj['Body'].read()
