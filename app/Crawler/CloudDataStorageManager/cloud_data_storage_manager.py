@@ -6,6 +6,7 @@ TODO
 """
 
 import boto3
+from botocore import errorfactory
 import json
 import re
 from functools import lru_cache
@@ -47,7 +48,7 @@ class CloudDataStorageManager(object):
                                     )
         self._list_object_paginator = self._client.get_paginator('list_objects')
 
-    def get_dataset_files_list(self, bucket: str) -> list:
+    def get_dataset_files_list(self, bucket: str) -> Union[None, list]:
 
         """
         Get all dataset files in the specified bucket
@@ -57,24 +58,32 @@ class CloudDataStorageManager(object):
         # what happens if the bucket doesn't exist? I think the paginate matheod will throw an exception and quit
         # we need to handle an exceptions here I think
         page_iterator = self._list_object_paginator.paginate(Bucket = bucket)
-        contents = [page['Contents'] for page in page_iterator]
-        dataset_files_to_return = []
+        try:
+            contents = [page['Contents'] for page in page_iterator]
+            dataset_files_to_return = []
 
-        for entry in contents:
-            # loop through evey item in a page
-            for object in entry:
-                # directroies are returned just like files are but they have a size of 0
-                # so here let's only consider files
-                if object["Size"] > 1:
-                    # here we only want to consider the files that are actual dataset files
-                    if re.match(".*\/data\/.*", object["Key"]):
-                        dataset_files_to_return.append(object)
+            for entry in contents:
+                # loop through evey item in a page
+                for object in entry:
+                    # directroies are returned just like files are but they have a size of 0
+                    # so here let's only consider files
+                    if object["Size"] > 1:
+                        # here we only want to consider the files that are actual dataset files
+                        if re.match(".*\/data\/.*", object["Key"]):
+                            dataset_files_to_return.append(object)
+
+                        else:
+                            pass
+
                     else:
                         pass
-                else:
-                    pass
 
-        return dataset_files_to_return
+            return dataset_files_to_return
+
+        except Exception as e:
+            print(f"WARNING: got paginator error for bucket {bucket}")
+            print(e)
+            return None
 
     def get_manifest_file(self,
                           bucket: str,
