@@ -1,8 +1,6 @@
 """
 TODO:
     - could this be done in parallel? I think we should use threading
-    - add in audit statments so progress can be tracked for logs
-    -
 """
 
 from app.Crawler.CloudDataStorageManager import CloudDataStorageManager
@@ -99,7 +97,6 @@ class Crawler(object):
         dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
 
         if dataset_file_extension in shape_file_formats:
-            # disspacth to shape file data handler
             print(f"ERROR: dataset file is Shape file format, this is currently not supported")
             return None
 
@@ -108,8 +105,8 @@ class Crawler(object):
                 header_list, num_rows = create_geojson_metadata(file = dataset_file_flo)
                 return [header_list, num_rows]
 
-            except:
-                # this except is too broad
+            except Exception as e:
+                print(e)
                 print(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson formats of json files are currently supported")
                 return None
 
@@ -118,8 +115,8 @@ class Crawler(object):
                 header_list, num_rows = create_csv_metadata(file = dataset_file_flo)
                 return [header_list, num_rows]
 
-            except:
-                # except is too broad
+            except Exception as e:
+                print(e)
                 return None
 
         elif dataset_file_extension == ".gpkg":
@@ -127,8 +124,8 @@ class Crawler(object):
                 layers, headers_list, num_rows = create_gpkg_metadata(file = dataset_file_flo)
                 return [layers, headers_list, num_rows]
 
-            except:
-                # except is too broad
+            except Exception as e:
+                print(e)
                 return None
 
         else:
