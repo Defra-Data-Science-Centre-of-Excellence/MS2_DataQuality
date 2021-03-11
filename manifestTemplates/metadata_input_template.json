@@ -2,7 +2,7 @@
   "data_name": "string",
   "generated_by_elm": "string - pick list",
   "data_description": "string",
-  "responsible_org": "string",
+  "responsible_organisation": "string",
   "data_sensitivity": "string",
   "sharing_agreements_or_copyright_limitations": "string",
   "public_access_limitations": "string",
