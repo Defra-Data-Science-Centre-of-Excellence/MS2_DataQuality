@@ -8,9 +8,11 @@ TODO:
 from app.Crawler.CloudDataStorageManager import CloudDataStorageManager
 from app.dataHandlers import *
 from os.path import dirname, splitext
+import os
 from typing import Union
 import time
 import pandas as pd
+from app.main_aux import load_json_file
 
 
 class Crawler(object):
@@ -24,6 +26,8 @@ class Crawler(object):
         Sets up an instance of CloudDataStorageManager interact with S3 buckets
         """
         self._cdsm = CloudDataStorageManager(credentials_fp = credentials_fp)
+        # TODO link this to main script and have companion file passed in as __init__ param
+        self._companion_json = load_json_file(f"{os.getcwd()}/app/script_companion.json")
 
     def create_metadata_for_bucket(self, bucket: str) -> None:
         """
@@ -54,28 +58,25 @@ class Crawler(object):
                 else:
 
                     # here we need to combine the created metdata and the manifest metdata
-                    # TODO tidy up logic & import script companion json
                     metadata_row = []
-                    for header in output_column_order:
-                        if header in manifest_mappings.keys():
-                            metadata_row.append(manifest_file['header'])
-                        elif header in generated_data_export_mappings.keys():
-                            if header == "file_url":
-                                metadata_row.append(dataset_dir_name)
-                            elif header == "data_last_updated":
-                                metadata_row.append(created_dataset_metadata[])
+                    generated_fields = {"file_url": dataset_dir_name,
+                                        "data_last_updated": "",
+                                        "column_names": "",
+                                        "row_count": "",
+                                        "geo_layers": "",
+                                        "file_size": "",
+                                        "file_extensions": ""}
+                    for k, v in self._companion_json["metadata_columns"]:
+                        if k in manifest_file.keys():
+                            metadata_row.append(manifest_file[k])
+                        elif k in generated_fields.keys():
+                            metadata_row.append(generated_fields[k])
                     csv_data.append(metadata_row)
 
-
-            export_columns = []
-            # TODO tidy up with better data structure
-            for col in output_column_order:
-                if col in manifest_mappings.keys():
-                    export_columns.append(manifest_mappings[col])
-                elif col in generated_data_export_mappings.keys():
-                    export_columns.append(generated_data_export_mappings[col])
-            export_df = pd.DataFrame(columns=export_columns)
-            export_df.to_csv()
+            export_columns = self._companion_json["metadata_columns"].values()
+            export_df = pd.DataFrame(columns=export_columns, data=csv_data)
+            # TODO put in check if output folder exists
+            export_df.to_csv(f"{os.getcwd()}/output/elms-metadata.csv")
 
                 # So here is where we need to combine:
                 #   - the manifest file, variable: manifest_file - a dictionary format of the manifest file
