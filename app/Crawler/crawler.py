@@ -126,7 +126,7 @@ class Crawler(object):
         :return: list - of layers (optional depending on format), headers, and number of rows, if the file can't be
         parsed None is returned
         """
-        shape_file_formats = [".shp", ".shx", ".shb", ".cpg", ".dbf", ".prj", ".sbn", ".sbx", ".shp.xml"]  # TODO call from script_companion.json
+        shape_file_formats = self._companion_json["shape_file_extensions"]
         _, dataset_file_extension = splitext(dataset_file["Key"])
         dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
 
