@@ -39,12 +39,12 @@ class Crawler(object):
             # no bucket exists so we get no returned files
             print(f"ERROR: aborting metadata creation for bucket {bucket}")
         else:
+            csv_data = []
             for dataset_file in dataset_files:
                 print(f"Creating metadata file for dataset file {dataset_file['Key']}")
                 dataset_dir_name = dirname(dataset_file["Key"]).split("/")[0]
                 manifest_directory = f"{dataset_dir_name}/manifest/"
                 manifest_file = self._cdsm.get_manifest_file(bucket = bucket, manifest_directory = manifest_directory)
-                csv_data = []
 
                 if manifest_file is None:
                     print(f"ERROR: no manifest file returned, creation of metadata file for dataset file {dataset_file['Key']} aborted")
@@ -55,15 +55,23 @@ class Crawler(object):
                     if created_dataset_metadata is None:
                         print(f"WARNING: unable to create some metadata for dataset file {dataset_file['Key']}")
                     else:
-                        # here we need to combine the created metdata and the manifest metdata
+                        # here we need to combine the created metadata and the manifest metadata
                         metadata_row = []
+                        if len(created_dataset_metadata) == 2:
+                            gen_metadata = {"headers": created_dataset_metadata[0],
+                                            "num_rows": created_dataset_metadata[1],
+                                            "geo_layers": "N/A"}
+                        elif len(created_dataset_metadata) > 2:
+                            gen_metadata = {"headers": created_dataset_metadata[1],
+                                            "num_rows": created_dataset_metadata[2],
+                                            "geo_layers": created_dataset_metadata[0]}
                         generated_fields = {"file_url": dataset_dir_name,
-                                            "data_last_updated": "",
-                                            "column_names": "",
+                                            "data_last_updated": dataset_file['lastModified'],
+                                            "column_names": gen_metadata["headers"],
                                             "row_count": "",
                                             "geo_layers": "",
-                                            "file_size": "",
-                                            "file_extensions": ""}
+                                            "file_size": round(dataset_file['Size']/1048576, 2),  # convert to MB
+                                            "file_extensions": dataset_file['Key'].split('.')[-1]}
                         for k, v in self._companion_json["metadata_columns"]:
                             if k in manifest_file.keys():
                                 metadata_row.append(manifest_file[k])
@@ -71,22 +79,23 @@ class Crawler(object):
                                 metadata_row.append(generated_fields[k])
                         csv_data.append(metadata_row)
 
-                    export_columns = self._companion_json["metadata_columns"].values()
-                    export_df = pd.DataFrame(columns=export_columns, data=csv_data)
-                    # TODO put in check if output folder exists
-                    export_df.to_csv(f"{os.getcwd()}/output/elms-metadata.csv")
+            export_columns = self._companion_json["metadata_columns"].values()
+            export_df = pd.DataFrame(columns=export_columns, data=csv_data)
+            if not os.path.exists("./output"):
+                os.mkdir("./output")
+            export_df.to_csv("./output/elms-metadata.csv")
 
-                    # So here is where we need to combine:
-                    #   - the manifest file, variable: manifest_file - a dictionary format of the manifest file
-                    #   - aws metadata (e.g. datetime last updated, file_size), variable: dataset_file - a dictionary
-                    #   - the metadata we create by parsing, variable: created_dataset_metadata - a list of lists
-                    #     If the dataset file has layers the created_dataset_metadata looks like [layers, headers_list, num_rows]
-                    #     where layers is a list of lists with every entry being the name of the layaer, headers_list is
-                    #     is a list of lists where each list contains the headers for the layer at the same index and num rows
-                    #     is a list of the number of rows.
-                    #     If the dataset files doesn't have layers (i.e. geojson or csv) the created_dataset_metadata looks like
-                    #     [header_list, num_rows] where header_list is a list of the headers and num_rows is an integer, the
-                    #     number of rows
+            # So here is where we need to combine:
+            #   - the manifest file, variable: manifest_file - a dictionary format of the manifest file
+            #   - aws metadata (e.g. datetime last updated, file_size), variable: dataset_file - a dictionary
+            #   - the metadata we create by parsing, variable: created_dataset_metadata - a list of lists
+            #     If the dataset file has layers the created_dataset_metadata looks like [layers, headers_list, num_rows]
+            #     where layers is a list of lists with every entry being the name of the layaer, headers_list is
+            #     is a list of lists where each list contains the headers for the layer at the same index and num rows
+            #     is a list of the number of rows.
+            #     If the dataset files doesn't have layers (i.e. geojson or csv) the created_dataset_metadata looks like
+            #     [header_list, num_rows] where header_list is a list of the headers and num_rows is an integer, the
+            #     number of rows
 
     def create_metadata_for_buckets(self, buckets: list) -> None:
         """
