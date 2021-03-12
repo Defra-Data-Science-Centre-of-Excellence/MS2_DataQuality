@@ -57,6 +57,7 @@ class Crawler(object):
                     else:
                         # here we need to combine the created metadata and the manifest metadata
                         metadata_row = []
+
                         if len(created_dataset_metadata) == 2:
                             gen_metadata = {"headers": created_dataset_metadata[0],
                                             "num_rows": created_dataset_metadata[1],
@@ -65,11 +66,14 @@ class Crawler(object):
                             gen_metadata = {"headers": created_dataset_metadata[1],
                                             "num_rows": created_dataset_metadata[2],
                                             "geo_layers": created_dataset_metadata[0]}
+                        else:
+                            gen_metadata = {"headers": "", "num_rows": "", "geo_layers": ""}
+
                         generated_fields = {"file_url": dataset_dir_name,
                                             "data_last_updated": dataset_file['lastModified'],
                                             "column_names": gen_metadata["headers"],
-                                            "row_count": "",
-                                            "geo_layers": "",
+                                            "row_count": gen_metadata["num_rows"],
+                                            "geo_layers": gen_metadata["geo_layers"],
                                             "file_size": round(dataset_file['Size']/1048576, 2),  # convert to MB
                                             "file_extensions": dataset_file['Key'].split('.')[-1]}
                         for k, v in self._companion_json["metadata_columns"]:
@@ -126,11 +130,10 @@ class Crawler(object):
         :return: list - of layers (optional depending on format), headers, and number of rows, if the file can't be
         parsed None is returned
         """
-        shape_file_formats = self._companion_json["shape_file_extensions"]
         _, dataset_file_extension = splitext(dataset_file["Key"])
         dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
 
-        if dataset_file_extension in shape_file_formats:
+        if dataset_file_extension in self._companion_json["shape_file_extensions"]:
             print(f"ERROR: dataset file is Shape file format, this is currently not supported")
             return None
 
