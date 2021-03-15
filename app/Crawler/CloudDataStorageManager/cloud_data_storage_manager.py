@@ -1,12 +1,9 @@
 """
 TODO
-    - Check assumption: passing a json credentials file
     - Implement upload functionality
-    - what happens if you try to acesss a bucket that doesn't exist, this needs to be dealt with
 """
 
 import boto3
-from botocore import errorfactory
 import json
 import re
 from functools import lru_cache
@@ -150,9 +147,3 @@ class CloudDataStorageManager(object):
 
     def __repr__(self):
         return self.__str__()
-
-
-if __name__ == "__main__":
-    cdsm = CloudDataStorageManager(credentials_fp = "C:/Users/beellis/aws_creds.json")
-    dataset_file = cdsm.get_dataset_files_list(bucket = "elms-test-1")
-    print()

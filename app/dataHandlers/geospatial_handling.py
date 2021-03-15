@@ -12,6 +12,7 @@ def create_geospatial_metadata(file, type: str) -> tuple:
     Supported formats:
         - GeoPackage
         - GEOjson
+        - zipped shape files stored in local directories
 
     :param file: File-like object geopackage file
     :param type: File type / format
@@ -36,6 +37,10 @@ def create_geospatial_metadata(file, type: str) -> tuple:
         f.close()
         all_layers = fiona.listlayers(local_name)
         file = local_name
+    elif type == "shp":
+        file_to_rm = file
+        file = f"zip://{file}"
+        all_layers = [None]
     else:
         raise ValueError(f"File format {type} not recognised , at present only GEOjson and gpkg file formats "
                          f"are supported")
@@ -57,5 +62,7 @@ def create_geospatial_metadata(file, type: str) -> tuple:
 
     if type == "gpkg":
         remove(file)
+    elif type == "shp":
+        remove(file_to_rm)
 
     return layers, headers_list, num_rows
