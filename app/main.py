@@ -37,6 +37,6 @@ if not os.path.exists("./output"):
     os.mkdir("./output")
 filename = f"elm-metadata-{datetime.now()}.csv"
 logger.info(f"Exporting metadata to local file system as {os.getcwd()}/output/{filename}...")
-export_df.to_csv(f"./output/{filename}")
+export_df.to_csv(f"./output/{filename}", index=False)
 
 # TODO Export metadata to S3
