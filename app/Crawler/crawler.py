@@ -26,6 +26,18 @@ class Crawler(object):
         # TODO link this to main script and have companion file passed in as __init__ param
         self._companion_json = companion
 
+    def export_file(self, bucket, export_directory, export_file_name, file_data) -> None:
+        """
+        Method to upload the metadata file to a cloud storage bucket
+        :param string bucket: Name of the bucket to upload metadata file to
+        :param string export_directory: directory within an S3 bucket to upload the metadata file to
+        :param string export_file_name: file name within an S3 bucket to upload the metadata file to
+        :param file_data: StringIO buffer of a pandas dataframe containing the metadata file data
+        :return: None
+        """
+        metadata_destination = f"{export_directory}/{export_file_name}"
+        self._cdsm.export_file_to_s3(bucket, metadata_destination, file_data)
+
     def create_metadata_for_bucket(self, bucket: str) -> list:
         """
         # TODO - this could be a lot cleaner if we spin stuff out to defs or as private methods, would also help with unit testing

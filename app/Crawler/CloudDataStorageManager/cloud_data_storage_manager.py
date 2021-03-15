@@ -43,7 +43,20 @@ class CloudDataStorageManager(object):
         self._client = boto3.client('s3',
                                     aws_access_key_id=aws_credentials["aws_access_key_id"],
                                     aws_secret_access_key=aws_credentials["aws_secret_access_key"])
+        self._s3_resource = boto3.resource('s3',
+                                           aws_access_key_id=aws_credentials["aws_access_key_id"],
+                                           aws_secret_access_key=aws_credentials["aws_secret_access_key"])
         self._list_object_paginator = self._client.get_paginator('list_objects')
+
+    def export_file_to_s3(self, bucket, metadata_destination, file_data) -> None:
+        """
+        Method to upload the metadata file to an S3 bucket
+        :param string bucket: Name of the bucket to upload metadata file to
+        :param string metadata_destination: directory + file name within an S3 bucket to upload the metadata file to
+        :param StringIO file_data: StringIO buffer of a pandas dataframe containing the metadata file data
+        :return: None
+        """
+        self._s3_resource.Object(bucket, metadata_destination).put(Body=file_data)
 
     def get_dataset_files_list(self, bucket: str) -> Union[None, list]:
         """

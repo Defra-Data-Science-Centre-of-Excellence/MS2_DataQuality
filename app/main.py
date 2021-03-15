@@ -3,6 +3,7 @@ from Crawler import crawler
 import os
 import pandas as pd
 from datetime import datetime
+from io import StringIO
 
 # Parse Command Line Arguments
 args = main_aux.parse_args()
@@ -40,4 +41,10 @@ filename = f"elm-metadata-{datetime.now()}.csv"
 logger.info(f"Exporting metadata to local file system as {os.getcwd()}/output/{filename}...")
 export_df.to_csv(f"./output/{filename}", index=False)
 
-# TODO Export metadata to S3
+# Export metadata to S3
+csv_buffer = StringIO()
+export_df.to_csv(csv_buffer)
+s3_crawler.export_file(bucket=config['bucket_to_write_to'],
+                       export_directory=config['metadata_destination_directory'],
+                       export_file_name=config['metadata_file_name'],
+                       file_data=csv_buffer.readlines())
