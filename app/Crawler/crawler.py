@@ -28,12 +28,12 @@ class Crawler(object):
         # TODO link this to main script and have companion file passed in as __init__ param
         self._companion_json = load_json_file(f"{os.getcwd()}/app/script_companion.json")
 
-    def create_metadata_for_bucket(self, bucket: str) -> None:
+    def create_metadata_for_bucket(self, bucket: str) -> list:
         """
         # TODO - this could be a lot cleaner if we spin stuff out to defs or as private methods, would also help with unit testing
         Create metadata for one bucket
         :param bucket: bucket to create metadata for
-        :return: nothing
+        :return list csv_data: list of lists containing metadata rows
         """
         dataset_files = self._cdsm.get_dataset_files_list(bucket = bucket)
 
@@ -120,11 +120,7 @@ class Crawler(object):
                                 metadata_row.append(generated_fields[k])
                         csv_data.append(metadata_row)
 
-            export_columns = self._companion_json["metadata_columns"].values()
-            export_df = pd.DataFrame(columns=export_columns, data=csv_data)
-            if not os.path.exists("./output"):
-                os.mkdir("./output")
-            export_df.to_csv("./output/elms-metadata.csv")
+            return csv_data
 
             # So here is where we need to combine:
             #   - the manifest file, variable: manifest_file - a dictionary format of the manifest file
@@ -138,14 +134,16 @@ class Crawler(object):
             #     [header_list, num_rows] where header_list is a list of the headers and num_rows is an integer, the
             #     number of rows
 
-    def create_metadata_for_buckets(self, buckets: list) -> None:
+    def create_metadata_for_buckets(self, buckets: list) -> list:
         """
         Create metadata for a list of buckets
         :param buckets:
-        :return:
+        :return list csv_data: list of lists containing metadata rows from across all buckets specified in the config
         """
+        csv_data = []
         for bucket in buckets:
-            self.create_metadata_for_bucket(bucket = bucket)
+            csv_data.extend(self.create_metadata_for_bucket(bucket = bucket))
+        return csv_data
 
     def create_data_quality_for_bucket(self, bucket):
         # TODO build sprint 4
