@@ -65,7 +65,7 @@ class CloudDataStorageManager(object):
             for entry in contents:
                 # loop through evey item in a page
                 for object in entry:
-                    # directroies are returned just like files are but they have a size of 0
+                    # directories are returned just like files are but they have a size of 0
                     # so here let's only consider files
                     if object["Size"] > 1:
                         # here we only want to consider the files that are actual dataset files
