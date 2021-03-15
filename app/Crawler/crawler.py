@@ -101,7 +101,7 @@ class Crawler(object):
                         elif len(created_dataset_metadata) > 2:
                             gen_metadata = {"headers": created_dataset_metadata[1],
                                             "num_rows": created_dataset_metadata[2],
-                                            "geo_layers": created_dataset_metadata[0]}
+                                            "geo_layers": str(created_dataset_metadata[0])}
                         else:
                             gen_metadata = {"headers": "", "num_rows": "", "geo_layers": ""}
 
@@ -118,6 +118,8 @@ class Crawler(object):
                                 metadata_row.append(manifest_file[k])
                             elif k in generated_fields.keys():
                                 metadata_row.append(generated_fields[k])
+                            else:
+                                metadata_row.append("")
                         csv_data.append(metadata_row)
 
             return csv_data
