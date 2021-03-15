@@ -3,14 +3,14 @@ TODO:
     - could this be done in parallel? I think we should use threading
 """
 
-from app.Crawler.CloudDataStorageManager import CloudDataStorageManager
-from app.Crawler.CloudDataStorageManager import ShapeFileCollator
-from app.dataHandlers import *
+from Crawler.CloudDataStorageManager import CloudDataStorageManager
+from Crawler.CloudDataStorageManager import ShapeFileCollator
+from dataHandlers import *
 from os.path import dirname, splitext
 import os
 from typing import Union
 import pandas as pd
-from app.main_aux import load_json_file
+from main_aux import load_json_file
 import gc
 
 
