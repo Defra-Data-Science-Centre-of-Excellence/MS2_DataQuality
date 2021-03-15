@@ -1,31 +1,38 @@
 import main_aux
-import json
+from app.Crawler import crawler
+import os
+import pandas as pd
+from datetime import datetime
 
 # Parse Command Line Arguments
 args = main_aux.parse_args()
 mode = args.mode
 configPath = args.config
 
+# Configure Logger
 logger = main_aux.create_logger()
 
 # Load config file
 logger.info("Loading config file...")
 config = main_aux.load_json_file(args.config)
 
-# Connect to S3
+# Load companion file
+logger.info("Loading companion file...")
+companion = main_aux.load_json_file(f"{os.getcwd()}/app/script_companion.json")
 
-# Traverse S3 directories
+# Connect to S3 & compute metadata
+logger.debug("Instantiating S3 crawler object...")
+s3_crawler = crawler.Crawler(credentials_fp=config['aws_credentials_json_location'])
+logger.info("Starting S3 bucket crawler...")
+metadata = s3_crawler.create_metadata_for_buckets(config['buckets_to_read'])
 
-# Ingest manifest
+# Export metadata to local file system
+export_columns = companion["metadata_columns"].values()
+export_df = pd.DataFrame(columns=export_columns, data=metadata)
+if not os.path.exists("./output"):
+    os.mkdir("./output")
+filename = f"elm-metadata-{datetime.now()}.csv"
+logger.info(f"Exporting metadata to local file system as {os.getcwd()}/output/{filename}...")
+export_df.to_csv(f"./output/{filename}")
 
-# Determine type of file
-
-# Run analysis on file type - compute data quality
-
-# Join with manifest data
-
-# Export CSV locally + upload to S3?
-
-
-# if __name__ == '__main__':
-#     pass
+# TODO Export metadata to S3
