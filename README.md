@@ -25,9 +25,16 @@ The script needs a minimum of Python 3.7 to run, if the python version currently
 
 
 #### Installing Dependencies
+To install dependencies, the Python package manager PIP will be needed.
+If `pip` is not installed, please install it using the below command.
+
+**NOTE** you may require elevated permissions to do this (`sudo`), and as such will be asked for your password.
+ ```
+sudo apt install python3-pip
+```
 Navigate into the repository main folder 'elmsMetadata' and enter the following:
 ```
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 The requirements should take about 5 mins to install.
 The packages `fiona` and `geopandas` are required for parsing the Geospatial data. If there is any difficulty in installing these, please refer to the guide [here](https://geopandas.org/getting_started/install.html).
@@ -92,7 +99,7 @@ Cloud agnostic - abstraction for adapting to another Cloud storage provider
 ### Companion JSON File
 Fields, purpose, mapping
 
-### Technical Debt
+### Suggested Features to Implement Later
 This section details some technical features that are desired to be implemented or improved in future, but could not be built based on time constraints:
 - Trigger-based execution
 - Change Data Capture
@@ -102,13 +109,16 @@ This section details some technical features that are desired to be implemented 
 ## Testing
 This part of the document includes application test planning and results.
 
-### Test Plan
-#### Unit Tests
+### Unit Tests
+Carried out on the code itself to test the underlying logic of functions.
+#### Code Coverage
+Table, explanations
+#### Results
+Requirements vs results
 
-#### System Integration Testing
 
-#### User Acceptance Testing
+### System Integration Testing
+Requirements vs results
 
-### Code Coverage
-
-### Results
+### User Acceptance Testing
+Requirements vs results
