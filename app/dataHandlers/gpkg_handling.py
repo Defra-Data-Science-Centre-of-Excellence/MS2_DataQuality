@@ -1,4 +1,4 @@
-from app.dataHandlers.geospatial_handling import create_geospatial_metadata
+from dataHandlers.geospatial_handling import create_geospatial_metadata
 
 
 def create_gpkg_metadata(file) -> tuple:
