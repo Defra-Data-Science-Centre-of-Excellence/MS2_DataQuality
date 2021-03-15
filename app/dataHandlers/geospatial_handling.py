@@ -28,7 +28,7 @@ def create_geospatial_metadata(file, type: str) -> tuple:
         all_layers = [None]
         file = file.decode("utf-8")
     elif type == "gpkg":
-        # wrtie out to local temp directory work around
+        # write out to local temp directory work around
         if not exists("./temp"):
             mkdir("./temp")
         local_name = f"./temp/{uuid4().hex}.gpkg"
