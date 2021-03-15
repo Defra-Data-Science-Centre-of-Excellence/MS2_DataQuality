@@ -25,35 +25,33 @@ class CloudDataStorageManager(object):
 
     """
 
-    def __init__(self, credentials_fp: str):
-
+    def __init__(self, logger, credentials_fp: str):
         """
         Constructor
         Sets up
             - BaseClient object to interact with s3 buckets
             - Reusable paginator to list objects in s3 storage
 
+        :param logger: logging object
         :param credentials_fp: file path for aws credentials file
         """
-
+        self.logger = logger
+        self.logger.debug("Loading credentials file from directory specified in config file...")
         with open(credentials_fp) as cf:
             aws_credentials = json.load(cf)
-
+        # TODO to remove credentials for final version
         self._client = boto3.client('s3',
-                                    aws_access_key_id = aws_credentials["aws_access_key_id"],
-                                    aws_secret_access_key = aws_credentials["aws_secret_access_key"]
-                                    )
+                                    aws_access_key_id=aws_credentials["aws_access_key_id"],
+                                    aws_secret_access_key=aws_credentials["aws_secret_access_key"])
         self._list_object_paginator = self._client.get_paginator('list_objects')
 
     def get_dataset_files_list(self, bucket: str) -> Union[None, list]:
-
         """
         Get all dataset files in the specified bucket
         :param bucket: Bucket name
-        :return: list of dictionaries, with each dictionary containing the file path and additional metadata for a datafile
+        :return: list of dictionaries, with each dictionary containing the file path and additional metadata for a
+        datafile
         """
-        # what happens if the bucket doesn't exist? I think the paginate matheod will throw an exception and quit
-        # we need to handle an exceptions here I think
         page_iterator = self._list_object_paginator.paginate(Bucket = bucket)
         try:
             contents = [page['Contents'] for page in page_iterator]
@@ -78,8 +76,8 @@ class CloudDataStorageManager(object):
             return dataset_files_to_return
 
         except Exception as e:
-            print(f"WARNING: got paginator error for bucket {bucket}")
-            print(e)
+            self.logger.warning(f"WARNING: got paginator error for bucket {bucket}")
+            self.logger.exception(e)
             return None
 
     def get_manifest_file(self,
@@ -111,14 +109,15 @@ class CloudDataStorageManager(object):
                         # expected name and extension
                         if count == 2:
                             print(
-                                f"WARNING: could not find manifest file manifest.json in directory {manifest_directory}")
+                                f"WARNING: could not find manifest file manifest.json in directory "
+                                f"{manifest_directory}")
 
             # auditing errors for not finding manifest file
             elif len(page['Contents']) > 2:
-                print(f"WARNING: found more than one manifest file in directory {manifest_directory}")
+                self.logger.warning(f"WARNING: found more than one manifest file in directory {manifest_directory}")
 
             else:
-                print(f"WARNING: no manifest file found in directory {manifest_directory}")
+                self.logger.warning(f"WARNING: no manifest file found in directory {manifest_directory}")
 
     def read_file_from_storage(self, bucket: str, key: str) -> bytes:
         """

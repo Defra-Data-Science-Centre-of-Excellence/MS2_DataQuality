@@ -22,7 +22,8 @@ companion = main_aux.load_json_file(f"{os.getcwd()}/app/script_companion.json")
 
 # Connect to S3 & compute metadata
 logger.debug("Instantiating S3 crawler object...")
-s3_crawler = crawler.Crawler(credentials_fp=config['aws_credentials_json_location'],
+s3_crawler = crawler.Crawler(logger=logger,
+                             credentials_fp=config['aws_credentials_json_location'],
                              companion=companion)
 logger.info("Starting S3 bucket crawler...")
 metadata = s3_crawler.create_metadata_for_buckets(config['buckets_to_read'])
