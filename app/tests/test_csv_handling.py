@@ -2,7 +2,7 @@ from unittest import TestCase
 import os
 from io import StringIO
 import csv
-from app.dataHandlers import csv_handling
+from dataHandlers import csv_handling
 
 
 class testCsvHandling(TestCase):

@@ -10,7 +10,7 @@ from os.path import dirname, splitext
 import os
 from typing import Union
 import pandas as pd
-from app.main_aux import load_json_file
+from main_aux import load_json_file
 import gc
 
 
@@ -19,21 +19,21 @@ class Crawler(object):
     Class to crawl through buckets and create metadata or data quality reports
     """
 
-    def __init__(self, credentials_fp: str):
+    def __init__(self, credentials_fp: str, companion: dict):
         """
         Constructor
         Sets up an instance of CloudDataStorageManager to interact with S3 buckets
         """
         self._cdsm = CloudDataStorageManagerAWS(credentials_fp = credentials_fp)
         # TODO link this to main script and have companion file passed in as __init__ param
-        self._companion_json = load_json_file(f"{os.getcwd()}/app/script_companion.json")
+        self._companion_json = companion
 
-    def create_metadata_for_bucket(self, bucket: str) -> None:
+    def create_metadata_for_bucket(self, bucket: str) -> list:
         """
         # TODO - this could be a lot cleaner if we spin stuff out to defs or as private methods, would also help with unit testing
         Create metadata for one bucket
         :param bucket: bucket to create metadata for
-        :return: nothing
+        :return list csv_data: list of lists containing metadata rows
         """
         dataset_files = self._cdsm.get_dataset_files_list(bucket = bucket)
 
@@ -101,7 +101,7 @@ class Crawler(object):
                         elif len(created_dataset_metadata) > 2:
                             gen_metadata = {"headers": created_dataset_metadata[1],
                                             "num_rows": created_dataset_metadata[2],
-                                            "geo_layers": created_dataset_metadata[0]}
+                                            "geo_layers": str(created_dataset_metadata[0])}
                         else:
                             gen_metadata = {"headers": "", "num_rows": "", "geo_layers": ""}
 
@@ -113,18 +113,16 @@ class Crawler(object):
                                             "file_size": round(dataset_file['Size']/1048576, 2),  # convert to MB
                                             "file_extensions": dataset_file['Key'].split('.')[-1]}
 
-                        for k, v in self._companion_json["metadata_columns"]:
+                        for k, v in self._companion_json["metadata_columns"].items():
                             if k in manifest_file.keys():
                                 metadata_row.append(manifest_file[k])
                             elif k in generated_fields.keys():
                                 metadata_row.append(generated_fields[k])
+                            else:
+                                metadata_row.append("")
                         csv_data.append(metadata_row)
 
-            export_columns = self._companion_json["metadata_columns"].values()
-            export_df = pd.DataFrame(columns=export_columns, data=csv_data)
-            if not os.path.exists("./output"):
-                os.mkdir("./output")
-            export_df.to_csv("./output/elms-metadata.csv")
+            return csv_data
 
             # So here is where we need to combine:
             #   - the manifest file, variable: manifest_file - a dictionary format of the manifest file
@@ -138,14 +136,16 @@ class Crawler(object):
             #     [header_list, num_rows] where header_list is a list of the headers and num_rows is an integer, the
             #     number of rows
 
-    def create_metadata_for_buckets(self, buckets: list) -> None:
+    def create_metadata_for_buckets(self, buckets: list) -> list:
         """
         Create metadata for a list of buckets
         :param buckets:
-        :return:
+        :return list csv_data: list of lists containing metadata rows from across all buckets specified in the config
         """
+        csv_data = []
         for bucket in buckets:
-            self.create_metadata_for_bucket(bucket = bucket)
+            csv_data.extend(self.create_metadata_for_bucket(bucket = bucket))
+        return csv_data
 
     def create_data_quality_for_bucket(self, bucket):
         # TODO build sprint 4

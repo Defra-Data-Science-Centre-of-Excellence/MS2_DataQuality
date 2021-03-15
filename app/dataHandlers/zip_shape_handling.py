@@ -1,4 +1,4 @@
-from app.dataHandlers.gpkg_handling import create_geospatial_metadata
+from dataHandlers.gpkg_handling import create_geospatial_metadata
 
 
 def create_shape_metadata(file):

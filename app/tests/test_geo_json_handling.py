@@ -1,4 +1,4 @@
-from app.dataHandlers import create_geojson_metadata, create_geojson_data_quality_report
+from dataHandlers import create_geojson_metadata, create_geojson_data_quality_report
 from unittest import TestCase
 import os
 
