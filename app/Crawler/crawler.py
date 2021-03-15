@@ -19,14 +19,14 @@ class Crawler(object):
     Class to crawl through buckets and create metadata or data quality reports
     """
 
-    def __init__(self, credentials_fp: str):
+    def __init__(self, credentials_fp: str, companion: dict):
         """
         Constructor
         Sets up an instance of CloudDataStorageManager to interact with S3 buckets
         """
         self._cdsm = CloudDataStorageManager(credentials_fp = credentials_fp)
         # TODO link this to main script and have companion file passed in as __init__ param
-        self._companion_json = load_json_file(f"{os.getcwd()}/app/script_companion.json")
+        self._companion_json = companion
 
     def create_metadata_for_bucket(self, bucket: str) -> list:
         """
@@ -113,7 +113,7 @@ class Crawler(object):
                                             "file_size": round(dataset_file['Size']/1048576, 2),  # convert to MB
                                             "file_extensions": dataset_file['Key'].split('.')[-1]}
 
-                        for k, v in self._companion_json["metadata_columns"]:
+                        for k, v in self._companion_json["metadata_columns"].items():
                             if k in manifest_file.keys():
                                 metadata_row.append(manifest_file[k])
                             elif k in generated_fields.keys():
