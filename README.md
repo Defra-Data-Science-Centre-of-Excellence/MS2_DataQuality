@@ -122,8 +122,8 @@ Your dataset directory should look like the following:
  ┃ ┗ :page_facing_up: my_example_data.csv  
  ┣ :open_file_folder: manifest  
  ┃ ┗ :page_facing_up: manifest.json  
- ┗ :open_file_folder: data_dictionary  
-   ┗ :page_facing_up: data_dictionary_example.xlsx
+ ┣ :open_file_folder: data_dictionary  
+ ┃ ┗ :page_facing_up: data_dictionary_example.xlsx
 
 
 ### The Manifest File
