@@ -1,4 +1,4 @@
-from dataHandlers import create_gpkg_metadata, create_gpkg_data_quality_report
+from app.dataHandlers import create_gpkg_metadata, create_gpkg_data_quality_report
 from unittest import TestCase
 import os
 
