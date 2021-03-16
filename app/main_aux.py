@@ -2,6 +2,7 @@ import argparse
 import json
 import sys
 import logging
+from datetime import datetime
 
 
 def create_logger(log_level=logging.INFO):
@@ -12,9 +13,13 @@ def create_logger(log_level=logging.INFO):
     """
     logger = logging.getLogger("elmsMetadataDQTool")
     formatter = logging.Formatter(f"[%(asctime)s] - [%(name)s] - [%(levelname)s] - %(message)s")
-    handler = logging.StreamHandler()
-    handler.setLevel(log_level)
-    handler.setFormatter(formatter)
+
+    handlers = [logging.StreamHandler(), logging.FileHandler(f"logs/elmsMetadata-log-{datetime.now()}")]
+    for handler in handlers:
+        handler.setLevel(log_level)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
     logger.setLevel(log_level)
     logger.addHandler(handler)
     logger.propagate = False
