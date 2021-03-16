@@ -18,7 +18,7 @@
   "eo_clean_water": "boolean",
   "eo_plants_wildlife": "boolean",
   "eo_bhe": "boolean",
-  "eo_hazards": "True",
+  "eo_hazards": "boolean",
   "eo_climate_change": "boolean",
   "ms3_uptake": "boolean",
   "ms4_environmental_value": "boolean",
