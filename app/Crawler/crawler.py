@@ -2,6 +2,7 @@
 TODO:
     - could this be done in parallel? I think we should use threading
 """
+
 from Crawler.CloudDataStorageManager import CloudDataStorageManagerAWS
 from Crawler.CloudDataStorageManager import ShapeFileCollator
 from dataHandlers import *

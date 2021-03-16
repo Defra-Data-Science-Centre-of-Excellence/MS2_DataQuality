@@ -1,1 +1,1 @@
-from .crawler import Crawler
+from Crawler.crawler import Crawler
