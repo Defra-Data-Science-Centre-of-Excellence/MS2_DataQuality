@@ -8,7 +8,7 @@ import json
 import re
 from functools import lru_cache
 from typing import Union
-from app.Crawler.CloudDataStorageManager.abc import CloudDataStorageManagerABC
+from Crawler.CloudDataStorageManager.abc import CloudDataStorageManagerABC
 
 
 class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
@@ -20,41 +20,53 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
 
     Usage:
 
-    cdsm = CloudDataStorageManager(credentials_fp = "some/fp/here")
+    cdsm = CloudDataStorageManager(logger=logger, credentials_fp="some/fp/here")
 
     all_dataset_file = cdsm.get_dataset_files_list(bucket = "elms-test-1")
 
     """
 
-    def __init__(self, credentials_fp: str):
+    def __init__(self, logger, credentials_fp: str):
         """
         Constructor
-
         Sets up
             - BaseClient object to interact with s3 buckets
             - Reusable paginator to list objects in s3 storage
 
+        :param logger: logging object
         :param credentials_fp: file path for aws credentials file
         """
-
+        self.logger = logger
+        self.logger.debug("Loading credentials file from directory specified in config file...")
         with open(credentials_fp) as cf:
             aws_credentials = json.load(cf)
-
+        # TODO to remove credentials for final version
         self._client = boto3.client('s3',
-                                    aws_access_key_id = aws_credentials["aws_access_key_id"],
-                                    aws_secret_access_key = aws_credentials["aws_secret_access_key"]
-                                    )
+                                    aws_access_key_id=aws_credentials["aws_access_key_id"],
+                                    aws_secret_access_key=aws_credentials["aws_secret_access_key"])
+        self._s3_resource = boto3.resource('s3',
+                                           aws_access_key_id=aws_credentials["aws_access_key_id"],
+                                           aws_secret_access_key=aws_credentials["aws_secret_access_key"])
         self._list_object_paginator = self._client.get_paginator('list_objects')
 
-    def get_dataset_files_list(self, bucket: str) -> Union[None, list]:
+    def export_file_to_s3(self, bucket, metadata_destination, file_data) -> None:
+        """
+        Method to upload the metadata file to an S3 bucket
+        :param string bucket: Name of the bucket to upload metadata file to
+        :param string metadata_destination: directory + file name within an S3 bucket to upload the metadata file to
+        :param StringIO file_data: StringIO buffer of a pandas dataframe containing the metadata file data
+        :return: None
+        """
+        self._s3_resource.Object(bucket, metadata_destination).put(Body=file_data)
 
+    def get_dataset_files_list(self, bucket: str) -> Union[None, list]:
         """
         Get all dataset files in the specified bucket
         :param bucket: Bucket name
-        :return: list of dictionaries, with each dictionary containing the file path and additional metadata for a datafile
+        :return: list of dictionaries, with each dictionary containing the file path and additional metadata for a
+        datafile
         """
-        # what happens if the bucket doesn't exist? I think the paginate matheod will throw an exception and quit
-        # we need to handle an exceptions here I think
+        self.logger.debug(f"Paginating objects in bucket {bucket}")
         page_iterator = self._list_object_paginator.paginate(Bucket = bucket)
         try:
             contents = [page['Contents'] for page in page_iterator]
@@ -79,8 +91,8 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
             return dataset_files_to_return
 
         except Exception as e:
-            print(f"WARNING: got paginator error for bucket {bucket}")
-            print(e)
+            self.logger.warning(f"WARNING: got paginator error for bucket {bucket}")
+            self.logger.exception(e)
             return None
 
     def get_manifest_file(self,
@@ -111,15 +123,16 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
                         # only audit this if both paths have been checked and the manifest file doesn't have the
                         # expected name and extension
                         if count == 2:
-                            print(
-                                f"WARNING: could not find manifest file manifest.json in directory {manifest_directory}")
+                            self.logger.warning(
+                                f"WARNING: could not find manifest file manifest.json in directory "
+                                f"{manifest_directory}")
 
             # auditing errors for not finding manifest file
             elif len(page['Contents']) > 2:
-                print(f"WARNING: found more than one manifest file in directory {manifest_directory}")
+                self.logger.warning(f"WARNING: found more than one manifest file in directory {manifest_directory}")
 
             else:
-                print(f"WARNING: no manifest file found in directory {manifest_directory}")
+                self.logger.warning(f"WARNING: no manifest file found in directory {manifest_directory}")
 
     def read_file_from_storage(self, bucket: str, key: str) -> bytes:
         """
@@ -128,6 +141,7 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
         :param key: the location of the file in the bucket
         :return: bytes - file in memory
         """
+        self.logger.debug(f"Retrieving file {key}")
         obj = self._client.get_object(Bucket = bucket, Key = key)
         return obj['Body'].read()
 
