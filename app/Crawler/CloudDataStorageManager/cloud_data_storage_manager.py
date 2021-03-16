@@ -1,21 +1,19 @@
 """
 TODO
-    - Check assumption: passing a json credentials file
     - Implement upload functionality
-    - what happens if you try to acesss a bucket that doesn't exist, this needs to be dealt with
 """
 
 import boto3
-from botocore import errorfactory
 import json
 import re
 from functools import lru_cache
 from typing import Union
+from app.Crawler.CloudDataStorageManager.abc import CloudDataStorageManagerABC
 
 
-class CloudDataStorageManager(object):
+class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
     """
-    CloudDataStorageManager is a class used to handle interactions with AWS S3 buckets
+    CloudDataStorageManagerAWS is a class used to handle interactions with AWS S3 buckets
 
     Note: This class is implemented in a cloud-agnostic manner, all returns are of python native types so to move to a
     different cloud storage solution for data, only this class would need to be reimplemented
@@ -29,9 +27,9 @@ class CloudDataStorageManager(object):
     """
 
     def __init__(self, credentials_fp: str):
-
         """
         Constructor
+
         Sets up
             - BaseClient object to interact with s3 buckets
             - Reusable paginator to list objects in s3 storage
@@ -150,9 +148,3 @@ class CloudDataStorageManager(object):
 
     def __repr__(self):
         return self.__str__()
-
-
-if __name__ == "__main__":
-    cdsm = CloudDataStorageManager(credentials_fp = "C:/Users/beellis/aws_creds.json")
-    dataset_file = cdsm.get_dataset_files_list(bucket = "elms-test-1")
-    print()
