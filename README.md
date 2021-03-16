@@ -126,8 +126,8 @@ Your dataset directory should look like the following:
  ┃ ┗ :page_facing_up: data_dictionary_example.xlsx
 
 
-### The Manifest File
-The manifest file is key for the script to incorporate ELM-specific information into the metadata file. As mentioned above, this file must be added into the `manifest` directory within each dataset's folder, and must **ALWAYS** be named `manifest.json`.
+### The Manifest Files (manifest.json)
+The manifest files are key for the script to incorporate ELM-specific information into the metadata file. As mentioned above, this file must be added into the `manifest` directory within each dataset's folder, and must **ALWAYS** be named `manifest.json`.
 
 An example of the manifest file is given within the `manifestTemplates` directory in this repository, but here we cover all the fields within the document.
 In the below block featuring an example of the document.
@@ -177,24 +177,22 @@ Most of the field names are self explanatory, however a number require special i
 ## Low Level Design - How the script works
 This element of the readme describes the design elements of the script, and the environment (including S3 bucket structure) it is currently configured to use in AWS.
 
-### Prerequisites
-AWS Access, key, SCE VM, python as above, Linux
-
 ### Access Management Approach
-The script is configured to use AWS IAM (in line with the SCE).
-AWS key, secret keys, RBAC EC2
+The script relies upon the Virtual Machine (AWS EC2) having the role-based permissions needed to interact with the S3 buckets that the user wishes the script to iterate over.
+Although access to a bucket can be granted to an individual user, granting this permission to a virtual machine allows scripts launched from the VM to interact with other AWS services without having to store access keys on file storage, or in memory.
 
 ### S3 Directory Structure
-data, manifest, data_dictionary
+As mentioned in the file upload guide for S3, Each dataset must have its own directory in the bucket's root directory, and within that, must have the `data`, `manifest` and `data_dictionary` folders.
+The `manifest.json` must be stored in the manifest folder, and the actual data must be stored in the `data` folder.
 
 ### Manifest Files
-What they're used for, description of each field
+The manifest files are key for the script to incorporate ELM-specific information into the metadata file. As mentioned above, this file must be added into the `manifest` directory within each dataset's folder, and must **ALWAYS** be named `manifest.json`.
 
 ### Crawler Class - Adapter pattern
 Cloud agnostic - abstraction for adapting to another Cloud storage provider
 
 ### Companion JSON File
-Fields, purpose, mapping
+The `script_companion.json` is a file for storing data pertaining to mapping the metadata output fields, in addition to storing expected file types.
 
 ### Suggested Features to Implement Later
 This section details some technical features that are desired to be implemented or improved in future, but could not be built based on time constraints:
