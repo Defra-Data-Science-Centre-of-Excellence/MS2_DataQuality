@@ -98,9 +98,9 @@ The metadata solution relies on a certain folder structure and supplementary fil
 Each S3 bucket is given a root address (e.g. `s3://my-bucket-1/`) from which files and folders can be further added. The script is designed to read every folder (but not file) within this base directory.
 Therefore, each dataset should be given its own folder in the root directory:
 
-:mailbox_with_no_mail: my-bucket-1
- ┣ :open_file_folder: dataset1
- ┣ :open_file_folder: dataset2
+:mailbox_with_no_mail: my-bucket-1  
+ ┣ :open_file_folder: dataset1  
+ ┣ :open_file_folder: dataset2  
  ┗ :open_file_folder: dataset3
 
 ### The Sub-Directories
@@ -117,12 +117,12 @@ The `data_dictionary` is a folder for storing the data dictionary for the datase
 
 Your dataset directory should look like the following:
 
-:open_file_folder: dataset1
- ┣ :open_file_folder: data
- ┃ ┗ :page_facing_up: my_example_data.csv
- ┣ :open_file_folder: manifest
- ┃ ┗ :page_facing_up: manifest.json
- ┗ :open_file_folder: data_dictionary
+:open_file_folder: dataset1  
+ ┣ :open_file_folder: data  
+ ┃ ┗ :page_facing_up: my_example_data.csv  
+ ┣ :open_file_folder: manifest  
+ ┃ ┗ :page_facing_up: manifest.json  
+ ┗ :open_file_folder: data_dictionary  
    ┗ :page_facing_up: data_dictionary_example.xlsx
 
 
