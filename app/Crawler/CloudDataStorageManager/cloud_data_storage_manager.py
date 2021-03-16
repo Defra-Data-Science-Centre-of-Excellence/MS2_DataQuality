@@ -8,11 +8,12 @@ import json
 import re
 from functools import lru_cache
 from typing import Union
+from Crawler.CloudDataStorageManager.abc import CloudDataStorageManagerABC
 
 
-class CloudDataStorageManager(object):
+class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
     """
-    CloudDataStorageManager is a class used to handle interactions with AWS S3 buckets
+    CloudDataStorageManagerAWS is a class used to handle interactions with AWS S3 buckets
 
     Note: This class is implemented in a cloud-agnostic manner, all returns are of python native types so to move to a
     different cloud storage solution for data, only this class would need to be reimplemented
