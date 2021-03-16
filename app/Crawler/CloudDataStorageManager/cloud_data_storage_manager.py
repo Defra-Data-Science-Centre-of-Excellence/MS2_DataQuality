@@ -19,7 +19,7 @@ class CloudDataStorageManager(object):
 
     Usage:
 
-    cdsm = CloudDataStorageManager(credentials_fp = "some/fp/here")
+    cdsm = CloudDataStorageManager(logger=logger, credentials_fp="some/fp/here")
 
     all_dataset_file = cdsm.get_dataset_files_list(bucket = "elms-test-1")
 
@@ -65,6 +65,7 @@ class CloudDataStorageManager(object):
         :return: list of dictionaries, with each dictionary containing the file path and additional metadata for a
         datafile
         """
+        self.logger.debug(f"Paginating objects in bucket {bucket}")
         page_iterator = self._list_object_paginator.paginate(Bucket = bucket)
         try:
             contents = [page['Contents'] for page in page_iterator]
@@ -121,7 +122,7 @@ class CloudDataStorageManager(object):
                         # only audit this if both paths have been checked and the manifest file doesn't have the
                         # expected name and extension
                         if count == 2:
-                            print(
+                            self.logger.warning(
                                 f"WARNING: could not find manifest file manifest.json in directory "
                                 f"{manifest_directory}")
 
@@ -139,6 +140,7 @@ class CloudDataStorageManager(object):
         :param key: the location of the file in the bucket
         :return: bytes - file in memory
         """
+        self.logger.debug(f"Retrieving file {key}")
         obj = self._client.get_object(Bucket = bucket, Key = key)
         return obj['Body'].read()
 

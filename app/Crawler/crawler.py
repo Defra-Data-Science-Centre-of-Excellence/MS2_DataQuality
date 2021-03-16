@@ -191,8 +191,7 @@ class Crawler(object):
         dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
 
         if dataset_file_extension in self._companion_json["shape_file_extensions"]:
-            self.logger.error()
-            print(f"ERROR: dataset file is Shape file format, this is currently not supported")
+            self.logger.error(f"ERROR: dataset file is Shape file format, this is currently not supported")
             return None
 
         elif dataset_file_extension == ".json":
@@ -201,9 +200,9 @@ class Crawler(object):
                 return [header_list, num_rows]
 
             except Exception as e:
-                print(e)
-                print(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
-                      f"formats of json files are currently supported")
+                self.logger.exception(e)
+                self.logger.error(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
+                                  f"formats of json files are currently supported")
                 return None
 
         elif dataset_file_extension == ".csv":
@@ -212,7 +211,7 @@ class Crawler(object):
                 return [header_list, num_rows]
 
             except Exception as e:
-                print(e)
+                self.logger.exception(e)
                 return None
 
         elif dataset_file_extension == ".gpkg":
@@ -221,11 +220,12 @@ class Crawler(object):
                 return [layers, headers_list, num_rows]
 
             except Exception as e:
-                print(e)
+                self.logger.exception(e)
                 return None
 
         else:
-            print(f"ERROR: did not recognise file extension {dataset_file_extension} for file {dataset_file['Key']}")
+            self.logger.error(f"ERROR: did not recognise file extension {dataset_file_extension} for "
+                              f"file {dataset_file['Key']}")
             return None
 
     def __str__(self):
