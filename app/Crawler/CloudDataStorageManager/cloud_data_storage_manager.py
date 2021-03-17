@@ -91,7 +91,7 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
             return dataset_files_to_return
 
         except Exception as e:
-            self.logger.warning(f"WARNING: got paginator error for bucket {bucket}")
+            self.logger.warning(f"WARNING: got AWS paginator error for bucket {bucket}")
             self.logger.exception(e)
             return None
 
@@ -129,10 +129,10 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
 
             # auditing errors for not finding manifest file
             elif len(page['Contents']) > 2:
-                self.logger.warning(f"WARNING: found more than one manifest file in directory {manifest_directory}")
+                self.logger.debug(f"WARNING: found more than one manifest file in directory {manifest_directory}")
 
             else:
-                self.logger.warning(f"WARNING: no manifest file found in directory {manifest_directory}")
+                self.logger.debug(f"WARNING: no manifest file found in directory {manifest_directory}")
 
     def read_file_from_storage(self, bucket: str, key: str) -> bytes:
         """

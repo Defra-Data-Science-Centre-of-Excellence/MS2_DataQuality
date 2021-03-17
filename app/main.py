@@ -1,8 +1,7 @@
-import main_aux
+from main_aux import *
 from Crawler import crawler
 import os
 import pandas as pd
-from datetime import datetime
 from io import StringIO
 
 # Parse Command Line Arguments
@@ -11,23 +10,18 @@ mode = args.mode
 configPath = args.config
 
 # Configure Logger
-if not os.path.exists("./logs"):
-    os.mkdir("./logs")
-logger = main_aux.create_logger()
+logger = create_logger()
 
 # Load config file
 logger.info("Loading config file...")
-config = main_aux.load_json_file(args.config)
-
+config = load_json_file(args.config)
 # Load companion file
 logger.info("Loading companion file...")
-companion = main_aux.load_json_file(f"{os.getcwd()}/app/script_companion.json")
+companion = load_json_file(f"{os.getcwd()}/app/script_companion.json")
 
 # Connect to S3 & compute metadata
 logger.debug("Instantiating S3 crawler object...")
-s3_crawler = crawler.Crawler(logger=logger,
-                             credentials_fp=config['aws_credentials_json_location'],
-                             companion=companion)
+s3_crawler = crawler.Crawler(logger, config['aws_credentials_json_location'], companion)
 logger.info("Starting S3 bucket crawler...")
 metadata = s3_crawler.create_metadata_for_buckets(config['buckets_to_read'])
 
@@ -35,13 +29,10 @@ metadata = s3_crawler.create_metadata_for_buckets(config['buckets_to_read'])
 logger.debug("Building export Dataframe...")
 export_columns = companion["metadata_columns"].values()
 export_df = pd.DataFrame(columns=export_columns, data=metadata)
+export_df['ID'] = export_df.index
 
 # Export metadata to local file system
-if not os.path.exists("./output"):
-    os.mkdir("./output")
-filename = f"{config['metadata_file_name']}-{datetime.now()}.csv"
-logger.info(f"Exporting metadata to local file system as {os.getcwd()}/output/{filename}...")
-export_df.to_csv(f"./output/{filename}", index=False)
+write_csv_out(logger, config, export_df)
 
 # Export metadata to S3
 csv_buffer = StringIO()
