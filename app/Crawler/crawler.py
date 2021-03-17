@@ -3,8 +3,8 @@ TODO:
     - could this be done in parallel? I think we should use threading
 """
 
-from Crawler.CloudDataStorageManager import CloudDataStorageManager
-from Crawler.CloudDataStorageManager import ShapeFileCollator
+from Crawler.CloudDataStorageManagerAWS import CloudDataStorageManager
+from Crawler.CloudDataStorageManagerAWS import ShapeFileCollator
 from dataHandlers import *
 from os.path import dirname, splitext
 from typing import Union
