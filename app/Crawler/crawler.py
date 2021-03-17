@@ -193,6 +193,9 @@ class Crawler(object):
                     self.logger.warning(f"WARNING: unable to create data quality report for dataset file "
                                         f"{dataset_file['Key']}")
                 else:
+                    print(f"Dq report for {dataset_dir_name}")
+                    for dqr in created_dq_dfs:
+                        print(dqr)
                     dq_reports_list.append(created_dq_dfs)
             # TODO upload this to aws, it's a list of lists where each entry is a dataframe
             return dq_reports_list
@@ -227,9 +230,8 @@ class Crawler(object):
                  None - if the zip couldn't be read
         """
         if format == "shape":
-            # need to implement once Hasdeep is done
-            gdf_list = create_shape_data_quality_report(file=fp, last_modified = last_modified)
-            return gdf_list
+            df_list = create_shape_data_quality_report(file=fp, last_modified = last_modified)
+            return df_list
         else:
             return None
 
@@ -269,9 +271,8 @@ class Crawler(object):
 
         elif dataset_file_extension == ".json":
             try:
-                # TODO refine this
-                some_return = create_geojson_data_quality_report(file = dataset_file_flo, last_modified = last_modified)
-                return some_return
+                df_list = create_geojson_data_quality_report(file = dataset_file_flo, last_modified = last_modified)
+                return df_list
 
             except Exception as e:
                 self.logger.exception(e)
@@ -281,9 +282,9 @@ class Crawler(object):
 
         elif dataset_file_extension == ".csv":
             try:
-                # TODO refine this
-                some_return = create_csv_data_quality_report(file = dataset_file_flo)
-                return some_return
+                # TODO implement this
+                df_list = create_csv_data_quality_report(file = dataset_file_flo)
+                return df_list
 
             except Exception as e:
                 self.logger.exception(e)
@@ -291,9 +292,8 @@ class Crawler(object):
 
         elif dataset_file_extension == ".gpkg":
             try:
-                some_return = create_gpkg_data_quality_report(file = dataset_file_flo, last_modified = last_modified)
-                return some_return
-
+                df_list = create_gpkg_data_quality_report(file = dataset_file_flo, last_modified = last_modified)
+                return df_list
             except Exception as e:
                 self.logger.exception(e)
                 return None

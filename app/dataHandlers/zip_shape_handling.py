@@ -22,6 +22,4 @@ def create_shape_data_quality_report(file: str, last_modified: str) -> list:
     """
     gdf_list = create_geospatial_metadata_and_dq(file, type = "shp", output = "dq")
     dq_df = create_dq_reports(gdf_list, last_modified)
-    for df in dq_df:
-        print(df)
     return dq_df

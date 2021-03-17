@@ -23,7 +23,6 @@ def create_dq_reports(gdf_list: list, last_modified: str) -> list:
         if len_gdf > 0: # BE: why do we need to check if the length is > 0?
             try:
                 full_unique = 1 - (len(gdf) - len(gdf.drop_duplicates())) / len_gdf
-
             except Exception as e:
                 # BE: I don't think this is necessary
                 print(e)
@@ -81,7 +80,6 @@ def create_dq_reports(gdf_list: list, last_modified: str) -> list:
         try:
 
             for col in object_cols:
-
                 # BE: what is temp?
                 temp = gdf_as_df[gdf_as_df[col].notna()]  # Removes rows which are NA
                 temp['checker'] = temp[col].str.match("\d+")  # TRUE = Only Digits, FALSE = Anything else
@@ -118,6 +116,7 @@ def create_dq_reports(gdf_list: list, last_modified: str) -> list:
                                                                                         on = 'Column').merge(
             object_type_checker, how = 'outer', on = 'Column')
 
+
         # Fill NA values in Percent Column with the appropriate string (data already appropriately encoded as int64 or
         # float64)
         output_df['Percent'].fillna('Data type is set correctly', inplace = True)
@@ -129,10 +128,8 @@ def create_dq_reports(gdf_list: list, last_modified: str) -> list:
 
         # Testing to make sure no stray columns have been inserted in the DQ Process ##
         if len(output_df) == len(list(gdf_as_df)):
-            pass
+            gdf_dq_reports.append(output_df)
         else:
             print(f"ERROR: The output dataframe does not have the same number of columns as the original input file")
 
     return gdf_dq_reports
-
-
