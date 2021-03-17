@@ -191,6 +191,7 @@ class Crawler(object):
                                         f"{dataset_file['Key']}")
                 else:
                     # TODO collate outputs here
+                    pass
 
             return csv_data
 
@@ -283,7 +284,7 @@ class Crawler(object):
 
         elif dataset_file_extension == ".gpkg":
             try:
-                some_retur n= create_gpkg_data_quality_report(file = dataset_file_flo)
+                some_return= create_gpkg_data_quality_report(file = dataset_file_flo)
                 return some_return
 
             except Exception as e:
