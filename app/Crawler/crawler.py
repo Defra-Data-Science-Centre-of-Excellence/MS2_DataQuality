@@ -7,10 +7,7 @@ from Crawler.CloudDataStorageManager import CloudDataStorageManager
 from Crawler.CloudDataStorageManager import ShapeFileCollator
 from dataHandlers import *
 from os.path import dirname, splitext
-import os
 from typing import Union
-import pandas as pd
-from main_aux import load_json_file
 import gc
 
 
@@ -19,14 +16,27 @@ class Crawler(object):
     Class to crawl through buckets and create metadata or data quality reports
     """
 
-    def __init__(self, credentials_fp: str, companion: dict):
+    def __init__(self, logger, credentials_fp: str, companion: dict):
         """
         Constructor
         Sets up an instance of CloudDataStorageManager to interact with S3 buckets
         """
-        self._cdsm = CloudDataStorageManager(credentials_fp = credentials_fp)
+        self.logger = logger
+        self._cdsm = CloudDataStorageManager(logger=logger, credentials_fp=credentials_fp)
         # TODO link this to main script and have companion file passed in as __init__ param
         self._companion_json = companion
+
+    def export_file(self, bucket, export_directory, export_file_name, file_data) -> None:
+        """
+        Method to upload the metadata file to a cloud storage bucket
+        :param string bucket: Name of the bucket to upload metadata file to
+        :param string export_directory: directory within an S3 bucket to upload the metadata file to
+        :param string export_file_name: file name within an S3 bucket to upload the metadata file to
+        :param file_data: StringIO buffer of a pandas dataframe containing the metadata file data
+        :return: None
+        """
+        metadata_destination = f"{export_directory}/{export_file_name}"
+        self._cdsm.export_file_to_s3(bucket, metadata_destination, file_data)
 
     def create_metadata_for_bucket(self, bucket: str) -> list:
         """
@@ -39,43 +49,44 @@ class Crawler(object):
 
         if dataset_files is None:
             # no bucket exists so we get no returned files
-            print(f"ERROR: aborting metadata creation for bucket {bucket}")
+            self.logger.error(f"ERROR: aborting metadata creation for bucket {bucket}")
         else:
             csv_data = []
-            current_dir = dirname(dataset_files[0]["Key"]).split("/")[0]
             sfc = None
-
+            id_num = 0
             for dataset_file in dataset_files:
-                print(dataset_file)
-                print(f"Creating metadata file for dataset file {dataset_file['Key']}")
+                id_num += 1
+                self.logger.debug(f"Creating metadata for dataset file {dataset_file['Key']}")
                 dataset_dir_name = dirname(dataset_file["Key"]).split("/")[0]
 
-                if dataset_dir_name != current_dir:
-                    current_dir = dataset_dir_name
-
                 manifest_directory = f"{dataset_dir_name}/manifest/"
-                manifest_file = self._cdsm.get_manifest_file(bucket = bucket, manifest_directory = manifest_directory)
+                manifest_file = self._cdsm.get_manifest_file(bucket=bucket, manifest_directory=manifest_directory)
 
                 if manifest_file is None:
-                    print(f"ERROR: no manifest file returned, creation of metadata file for dataset file {dataset_file['Key']} aborted")
+                    self.logger.error(f"ERROR: no manifest file returned, creation of metadata file for dataset "
+                                      f"file {dataset_file['Key']}. Aborted operation.")
 
                 else:
                     dataset_file_extension = self._get_file_extension(dataset_file)
 
                     if dataset_file_extension in self._companion_json["shape_file_extensions"]:
-                        shape_file_dir = current_dir
-                        file = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file['Key'])
+                        shape_file_dir = dataset_dir_name
+                        file = self._cdsm.read_file_from_storage(bucket=bucket, key=dataset_file['Key'])
 
                         if sfc is None:
-                            sfc = ShapeFileCollator(dataset_dir = shape_file_dir)
+                            sfc = ShapeFileCollator(dataset_dir=shape_file_dir)
 
-                        sfc.add_file(file = file, file_extension = dataset_file_extension, current_dir = current_dir)
+                        sfc.add_file(file = file,
+                                     file_extension=dataset_file_extension,
+                                     current_dir = dataset_dir_name,
+                                     file_size = dataset_file['Size'])
 
                         if sfc.is_complete():
                             zipfile = sfc.zip_complete_file()
-                            created_dataset_metadata = self._create_dataset_file_metadata_for_zip(
-                                fp = zipfile, format = "shape")
+                            created_dataset_metadata, shp_file_size = self._create_dataset_file_metadata_for_zip(
+                                fp=zipfile, format="shape")
                             sfc = None
+                            dataset_file["Size"] = shp_file_size
                             # could force gc to release memory here, but it's probably not a huge concern
                             gc.collect()
 
@@ -83,17 +94,18 @@ class Crawler(object):
                             continue
 
                     else:
-                        created_dataset_metadata = self._create_dataset_file_metadata(bucket = bucket, dataset_file = dataset_file)
+                        created_dataset_metadata = self._create_dataset_file_metadata(bucket=bucket,
+                                                                                      dataset_file=dataset_file)
 
                     # TODO should this be a if, else??? This way we don't create metadata output files if we don't get
                     # created metadata back. I think if we remove the else here it should work better
                     if created_dataset_metadata is None:
-                        print(f"WARNING: unable to create some metadata for dataset file {dataset_file['Key']}")
+                        self.logger.warning(f"WARNING: unable to create metadata for dataset file "
+                                            f"{dataset_file['Key']}")
 
                     else:
                         # here we need to combine the created metadata and the manifest metadata
                         metadata_row = []
-
                         if len(created_dataset_metadata) == 2:
                             gen_metadata = {"headers": created_dataset_metadata[0],
                                             "num_rows": created_dataset_metadata[1],
@@ -118,23 +130,12 @@ class Crawler(object):
                                 metadata_row.append(manifest_file[k])
                             elif k in generated_fields.keys():
                                 metadata_row.append(generated_fields[k])
+                            elif k == 'id':
+                                metadata_row.append(id_num)
                             else:
                                 metadata_row.append("")
                         csv_data.append(metadata_row)
-
             return csv_data
-
-            # So here is where we need to combine:
-            #   - the manifest file, variable: manifest_file - a dictionary format of the manifest file
-            #   - aws metadata (e.g. datetime last updated, file_size), variable: dataset_file - a dictionary
-            #   - the metadata we create by parsing, variable: created_dataset_metadata - a list of lists
-            #     If the dataset file has layers the created_dataset_metadata looks like [layers, headers_list, num_rows]
-            #     where layers is a list of lists with every entry being the name of the layaer, headers_list is
-            #     is a list of lists where each list contains the headers for the layer at the same index and num rows
-            #     is a list of the number of rows.
-            #     If the dataset files doesn't have layers (i.e. geojson or csv) the created_dataset_metadata looks like
-            #     [header_list, num_rows] where header_list is a list of the headers and num_rows is an integer, the
-            #     number of rows
 
     def create_metadata_for_buckets(self, buckets: list) -> list:
         """
@@ -164,7 +165,7 @@ class Crawler(object):
     @staticmethod
     def _create_dataset_file_metadata_for_zip(fp: str, format: str) -> Union[list, None]:
         """
-        Creates metdata for a zipped dataset saved to a local dir by loading files into memory and parsin headers,
+        Creates metadata for a zipped dataset saved to a local dir by loading files into memory and parsin headers,
         layers and numbers of rows
 
         Note: only shape file datasets that are zipped are supported by this method
@@ -173,7 +174,7 @@ class Crawler(object):
         :return:
         """
         if format == "shape":
-            header_list, num_rows = create_shape_metadata(file = fp)
+            header_list, num_rows = create_shape_metadata(file=fp)
             return [header_list, num_rows]
         else:
             return None
@@ -193,7 +194,7 @@ class Crawler(object):
         dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
 
         if dataset_file_extension in self._companion_json["shape_file_extensions"]:
-            print(f"ERROR: dataset file is Shape file format, this is currently not supported")
+            self.logger.error(f"ERROR: dataset file is Shape file format, this is currently not supported")
             return None
 
         elif dataset_file_extension == ".json":
@@ -202,9 +203,9 @@ class Crawler(object):
                 return [header_list, num_rows]
 
             except Exception as e:
-                print(e)
-                print(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
-                      f"formats of json files are currently supported")
+                self.logger.exception(e)
+                self.logger.error(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
+                                  f"formats of json files are currently supported")
                 return None
 
         elif dataset_file_extension == ".csv":
@@ -213,7 +214,7 @@ class Crawler(object):
                 return [header_list, num_rows]
 
             except Exception as e:
-                print(e)
+                self.logger.exception(e)
                 return None
 
         elif dataset_file_extension == ".gpkg":
@@ -222,11 +223,12 @@ class Crawler(object):
                 return [layers, headers_list, num_rows]
 
             except Exception as e:
-                print(e)
+                self.logger.exception(e)
                 return None
 
         else:
-            print(f"ERROR: did not recognise file extension {dataset_file_extension} for file {dataset_file['Key']}")
+            self.logger.error(f"ERROR: did not recognise file extension {dataset_file_extension} for "
+                              f"file {dataset_file['Key']}")
             return None
 
     def __str__(self):
