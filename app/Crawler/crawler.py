@@ -82,8 +82,8 @@ class Crawler(object):
                                      file_size = dataset_file['Size'])
 
                         if sfc.is_complete():
-                            zipfile = sfc.zip_complete_file()
-                            created_dataset_metadata, shp_file_size = self._create_dataset_file_metadata_for_zip(
+                            zipfile, shp_file_size = sfc.zip_complete_file()
+                            created_dataset_metadata = self._create_dataset_file_metadata_for_zip(
                                 fp=zipfile, format="shape")
                             sfc = None
                             dataset_file["Size"] = shp_file_size
