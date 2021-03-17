@@ -5,7 +5,7 @@ import pandas as pd
 from io import StringIO
 
 # Parse Command Line Arguments
-args = main_aux.parse_args()
+args = parse_args()
 mode = args.mode
 configPath = args.config
 
