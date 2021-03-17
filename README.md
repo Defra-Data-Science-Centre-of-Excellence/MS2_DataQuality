@@ -7,7 +7,7 @@ This script is designed to automate the creation of a metadata file on the local
 This element of the readme describes how a user should engage with this script, including installing dependencies, configuration, and calling from the command line.
 
 ### 1. Prerequisites
-#### Scientific Computing Environment (SCE) Permissions
+#### 1.1 Scientific Computing Environment (SCE) Permissions
 The script is designed to be run from 'Ranch' virtual machines on the SCE, linking to the 'Ranch' AWS S3 buckets.
 As such, your will need to give the Virtual Machine you are executing the script from the following permissions:
 - READ permissions to the buckets you are running the crawler over
@@ -15,12 +15,12 @@ As such, your will need to give the Virtual Machine you are executing the script
 
 This is easily requested on the SCE Slack **#requests** channel asking to grant your virtual machine (e.g. **ranch-000**) access to the s3 buckets (e.g. **s3-ranch-000**) via an **EC2 role**.
 
-#### S3 Folder Structure
+#### 1.2 S3 Folder Structure
 The script relies on a certain file structure being in place on each S3 bucket in order to scan it effectively. **NOTE** that data and files outside this structure will not be picked up by the crawler script.
 
-Please see the **"Loading Data"** section below for specifics on this.
+Please see the **"Loading Data Guide"** section below for specifics on this.
 
-#### Python Version
+#### 1.3 Python Version
 This script uses Python 3, in addition to a number of dependencies that are installed with the Python package manager, PIP.
 First, check to ensure that Python is installed, and working on your command line.
 ```
@@ -37,7 +37,7 @@ Python 3.x.x
 The script needs a minimum of Python 3.7 to run, if the python version currently installed is older than this, please install using the [following guidance](https://docs.python-guide.org/starting/installation/).
 
 
-#### Installing Dependencies
+#### 1.4 Installing Dependencies
 To install dependencies, the Python package manager PIP will be needed.
 If `pip` is not installed, please install it using the below command.
 
@@ -94,7 +94,7 @@ Logs are written in .txt format and timestamped to the created `logs` folder wit
 ## Loading Data Guide (S3 File Structure)
 The metadata solution relies on a certain folder structure and supplementary files being in place in order to populate the metadata file effectively.
 
-### The Root Directory
+### 1. The Root Directory
 Each S3 bucket is given a root address (e.g. `s3://my-bucket-1/`) from which files and folders can be further added. The script is designed to read every folder (but not file) within this base directory.
 Therefore, each dataset should be given its own folder in the root directory:
 
@@ -103,7 +103,7 @@ Therefore, each dataset should be given its own folder in the root directory:
  ┣ :open_file_folder: dataset2  
  ┗ :open_file_folder: dataset3
 
-### The Sub-Directories
+### 2. The Sub-Directories
 Within each dataset folder, the following folders **MUST** exist:
 - `data`
 - `manifest`
@@ -126,7 +126,7 @@ Your dataset directory should look like the following:
  ┃ ┗ :page_facing_up: data_dictionary_example.xlsx
 
 
-### The Manifest Files (manifest.json)
+### 3. The Manifest Files (manifest.json)
 The manifest files are key for the script to incorporate ELM-specific information into the metadata file. As mentioned above, this file must be added into the `manifest` directory within each dataset's folder, and must **ALWAYS** be named `manifest.json`.
 
 An example of the manifest file is given within the `manifestTemplates` directory in this repository, but here we cover all the fields within the document.
@@ -176,6 +176,9 @@ Most of the field names are self explanatory, however a number require special i
 
 ## Low Level Design - How the script works
 This element of the readme describes the design elements of the script, and the environment (including S3 bucket structure) it is currently configured to use in AWS.
+
+### Format of the Metadata File
+Based off the ELMS version. Wil require adaptation if CDAP team want to incorporate ELMS data into their template.
 
 ### Access Management Approach
 The script relies upon the Virtual Machine (AWS EC2) having the role-based permissions needed to interact with the S3 buckets that the user wishes the script to iterate over.
