@@ -3,8 +3,8 @@ TODO:
     - could this be done in parallel? I think we should use threading
 """
 
-from Crawler.CloudDataStorageManagerAWS import CloudDataStorageManager
-from Crawler.CloudDataStorageManagerAWS import ShapeFileCollator
+from Crawler.CloudDataStorageManager import CloudDataStorageManagerAWS
+from Crawler.CloudDataStorageManager import ShapeFileCollator
 from dataHandlers import *
 from os.path import dirname, splitext
 from typing import Union
@@ -22,7 +22,7 @@ class Crawler(object):
         Sets up an instance of CloudDataStorageManager to interact with S3 buckets
         """
         self.logger = logger
-        self._cdsm = CloudDataStorageManager(logger=logger, credentials_fp=credentials_fp)
+        self._cdsm = CloudDataStorageManagerAWS(logger=logger, credentials_fp=credentials_fp)
         # TODO link this to main script and have companion file passed in as __init__ param
         self._companion_json = companion
 
