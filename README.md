@@ -2,10 +2,24 @@
 
 This script is designed to automate the creation of a metadata file on the local system the script is run from, and to a specified AWS S3 Bucket that the user has **WRITE** permissions to.
 
+## Table of Contents
+[User Guide](#userguide)
+1. [Prerequisites](#user-prereqs)
+2. [Config File](#user-config)
+3. [Calling the Script on the CLI](#user-script)
+4. [Viewing the Metadata File Output](#user-output)
+5. [Reviewing Logs](#user-logs)
 
+[Data Loading Guide](#dataloading)
+1. [Root Directory](#dataload-rd)
+2. [Dataset Sub-Directories](#dataload-sd)
+3. [Manifest Files](#dataload-mf)
+
+<a name="userguide"></a>
 ## User Guide
 This element of the readme describes how a user should engage with this script, including installing dependencies, configuration, and calling from the command line.
 
+<a name="user-prereqs"></a>
 ### 1. Prerequisites
 #### 1.1 Scientific Computing Environment (SCE) Permissions
 The script is designed to be run from 'Ranch' virtual machines on the SCE, linking to the 'Ranch' AWS S3 buckets.
@@ -52,6 +66,7 @@ pip3 install -r requirements.txt
 The requirements should take about 5 mins to install.
 The packages `fiona` and `geopandas` are required for parsing the Geospatial data. If there is any difficulty in installing these, please refer to the guide [here](https://geopandas.org/getting_started/install.html).
 
+<a name="user-config"></a>
 ### 2. Config File
 The config file is necessary for running the script, and is helpful for allowing users to be able to change the storage and credential configurations with ease.
 The config file contains the following information:
@@ -61,6 +76,7 @@ The config file contains the following information:
 
 A template with example values for the config file is included in this repository: `configExample.json` located in the base repository directory.
 
+<a name="user-script"></a>
 ### 3. Calling the Script on the CLI
 When running the script, the user must specify the mode they want the script to run (data quality or metadata), in addition to giving the script the location of the metadata file.
 Call the script with the following template:
@@ -82,18 +98,23 @@ The resulting command should look like:
 ```
 python3 app/main.py metadata "C://path/to/my/config.json"
 ```
+
+<a name="user-output"></a>
 ### 4. Viewing the Metadata File Output
 The metadata file is exported as a CSV file into the `outputs` subdirectory. The file is also exported to the S3 location you specified in the Config File.
 
+<a name="user-logs"></a>
 ### 5. Reviewing Logs (in case of error)
 The command line tool writes logs to the local file system for debug purposes. This log is to keep a track of the processes that take place inside the script while it is accessing cloud storage, and will provide detailed information on failures.
 
 Logs are written in .txt format and timestamped to the created `logs` folder within this directory.
 
 
+<a name="dataloading"></a>
 ## Loading Data Guide (S3 File Structure)
 The metadata solution relies on a certain folder structure and supplementary files being in place in order to populate the metadata file effectively.
 
+<a name="dataload-rd"></a>
 ### 1. The Root Directory
 Each S3 bucket is given a root address (e.g. `s3://my-bucket-1/`) from which files and folders can be further added. The script is designed to read every folder (but not file) within this base directory.
 Therefore, each dataset should be given its own folder in the root directory:
@@ -103,6 +124,7 @@ Therefore, each dataset should be given its own folder in the root directory:
  ┣ :open_file_folder: dataset2  
  ┗ :open_file_folder: dataset3
 
+<a name="dataload-sd"></a>
 ### 2. The Sub-Directories
 Within each dataset folder, the following folders **MUST** exist:
 - `data`
@@ -126,6 +148,7 @@ Your dataset directory should look like the following:
  ┃ ┗ :page_facing_up: data_dictionary_example.xlsx
 
 
+<a name="dataload-mf"></a>
 ### 3. The Manifest Files (manifest.json)
 The manifest files are key for the script to incorporate ELM-specific information into the metadata file. As mentioned above, this file must be added into the `manifest` directory within each dataset's folder, and must **ALWAYS** be named `manifest.json`.
 
