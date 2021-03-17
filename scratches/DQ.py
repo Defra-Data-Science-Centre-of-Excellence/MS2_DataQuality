@@ -4,11 +4,15 @@ from os.path import splitext
 import pandas as pd
 from datetime import datetime
 import boto3
-import numpy as np 
+import numpy as np
+
+import app.main_aux as main_aux
+logger = main_aux.create_logger()
+
 
 ## Functions and Classes ## 
 from dataHandlers import *
-from main_aux import *
+import app.main_aux
 from dataHandlers.geospatial_handling import create_geospatial_metadata_and_dq
 
 from Crawler import crawler
