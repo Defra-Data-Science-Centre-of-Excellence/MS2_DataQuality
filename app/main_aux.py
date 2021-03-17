@@ -25,7 +25,6 @@ def create_logger(log_level=logging.INFO):
     logger.addHandler(fh)
 
     logger.setLevel(log_level)
-    logger.addHandler(handler)
     logger.propagate = False
     return logger
 
