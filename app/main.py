@@ -45,8 +45,13 @@ export_df.to_csv(f"./output/{filename}", index=False)
 
 # Export metadata to S3
 csv_buffer = StringIO()
-export_df.to_csv(csv_buffer)
+export_df.to_csv(csv_buffer, index=False)
+logger.info(f"Exporting metadata to AWS S3...")
 s3_crawler.export_file(bucket=config['bucket_to_write_to'],
                        export_directory=config['metadata_destination_directory'],
                        export_file_name=f"{config['metadata_file_name']}.csv",
                        file_data=csv_buffer.getvalue())
+logger.info(f"Metadata file successfully uploaded, address of file will be s3://"
+            f"{config['bucket_to_write_to']}/"
+            f"{config['metadata_destination_directory']}/"
+            f"{config['metadata_file_name']}.csv.")
