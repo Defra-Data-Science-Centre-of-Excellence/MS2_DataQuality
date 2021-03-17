@@ -9,10 +9,10 @@ Sys.setenv("AWS_DEFAULT_REGION" = 'eu-west-1')
 
 ### GLOBAL SETTINGS ###
 ## How many metrics are in the DQ tool (excluding dataset name and column name)? ##
-Metrics = 6 
+Metrics = 7 
 
 ### Loading in local files (placeholder) ##
-Data <- read_excel("Data_quality_1_snapshot_17.3.2021.xlsx")
+Data <- read_excel("Data_quality_2_snapshot_17.3.2021.xlsx")
 
 ## Filter columns based on global setting Metrics ##
 ## This removes any stray columns and reduces ambiguity ##
@@ -28,5 +28,9 @@ Data$Dataset_extension <- gsub(".*\\.", "", Data$Dataset)
 ## Note, it may be useful to merge in a lookup table between datasets and data dict IDs 
 Data$Dataset <- gsub("/.*", "", Data$Dataset)
 
-## Loading in all outputs from AWS S3 ## 
+## Reformat the Date ##
+Data$`Last Modified` <- format(as.Date(substr(Data$`Last Modified`, 1, 10), format="%Y-%m-%d"), '%d-%m-%Y')
+
+## Loading in all outputs from AWS S3 ##
+## This will append all datasets in one go ## 
 ## TBU ## 

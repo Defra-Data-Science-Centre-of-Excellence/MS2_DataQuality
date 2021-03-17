@@ -11,6 +11,8 @@ library(shinyWidgets) ## Used for more UI friendly drop down menus ##
 library(shinyjs) ## Used to incorporate JS functionality (e.g reset buttons)
 library(DT)
 
+source('Data_Landing.R')
+
 ui <- dashboardPage( ## Using fluid Page > Dashboard page --> One page dashboard 
   
   skin = "green",
@@ -42,24 +44,10 @@ ui <- dashboardPage( ## Using fluid Page > Dashboard page --> One page dashboard
           img(src='Defra.png', align = "centre"),
           img(src='DQHub_white_background-final.png', align = "centre")
           
-          )),
-    
-    column(width = 7,
-    fluidRow(
-      width = 12,
-      DT::dataTableOutput("table_export")
-    ),
-    
-    fluidRow(
-      shiny::h3(textOutput("Unique_rows")),
-      shiny::h3(textOutput("Contains_geo"))
-    ))),
+          ),
       
-        # shinyjs::useShinyjs(),
-        # column(width=1, 
-        #        span("")),
-        fluidRow(
-        column(width = 5,
+      fluidRow(
+        column(width = 12,
                box(title = strong("Choose your dataset and file type"),
                    width = 12,
                    status = "success",
@@ -69,19 +57,37 @@ ui <- dashboardPage( ## Using fluid Page > Dashboard page --> One page dashboard
                                       "ELMS Dataset",
                                       choices = c(unique(Data$Dataset)),
                                       selected = unique(Data$Dataset)[1],
-                                      options = list(`actions-box` = TRUE),multiple = F)),
+                                      options = list(`actions-box` = TRUE), multiple = F)), ## F = Do not allow multiple choices 
                    column(width = 5,
                           
                           pickerInput("Dataset_ext",
                                       "File type (extension)",
                                       choices = c(unique(Data$Dataset_extension)),
                                       selected = unique(Data$Dataset_extension)[1],
-                                      options = list(`actions-box` = TRUE),multiple = F)),
-                          
-                          ))),
+                                      options = list(`actions-box` = TRUE), multiple = F)), ## F = Do not allow multiple choices 
+                   
+               )))
+      
+      
+      ),
+    
+    column(width = 6,
+    fluidRow(
+      width = 12,
+      shiny::h4(strong("Data Quality Report (Exportable) - Top 10 rows")),
+      DT::dataTableOutput("table"),
+    
+    ## To do: Footnote explanations of each column and colour coding underneath the LHS boxes ##
+    
+    
+    fluidRow(
+      shiny::h3("Dataset level metrics:"),
+      shiny::h4(textOutput("Unique_rows"), style="color:#b35900"),
+      shiny::h4(textOutput("Contains_geo"), style="color:#009933")
+    )))
+      
         
-
-))
+)))
 
 
 
