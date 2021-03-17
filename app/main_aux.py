@@ -23,6 +23,9 @@ def create_logger(log_level=logging.INFO):
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(formatter)
     logger.addHandler(fh)
+
+    logger.setLevel(logging.DEBUG)
+    logger.propagate = False
     return logger
 
 
