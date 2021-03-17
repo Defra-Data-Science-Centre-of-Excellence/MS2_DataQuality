@@ -3,9 +3,9 @@ TODO:
     - could this be done in parallel? I think we should use threading
 """
 
-from Crawler.CloudDataStorageManager import CloudDataStorageManagerAWS
-from Crawler.CloudDataStorageManager import ShapeFileCollator
-from dataHandlers import *
+from app.Crawler.CloudDataStorageManager import CloudDataStorageManagerAWS
+from app.Crawler.CloudDataStorageManager import ShapeFileCollator
+from app.dataHandlers import *
 from os.path import dirname, splitext
 from typing import Union
 import gc
@@ -143,6 +143,7 @@ class Crawler(object):
 
     def create_data_quality_for_bucket(self, bucket: str) -> list    :
         """
+        Create dq reports for one bucket
         # TODO - a lot of this is reproduced from create_metadata_for_bucket, we should find a way to reduce
         :param bucket:
         :return:
@@ -153,8 +154,7 @@ class Crawler(object):
             # no bucket exists so we get no returned files
             self.logger.error(f"ERROR: aborting data quality report creation for bucket {bucket}")
         else:
-            csv_data = []
-            current_dir = dirname(dirname(dataset_files[0]["Key"]).split("/")[0])
+            dq_reports_list = []
             sfc = None
 
             for dataset_file in dataset_files:
@@ -174,8 +174,9 @@ class Crawler(object):
 
                     if sfc.is_complete():
                         zipfile = sfc.zip_complete_file()
-                        created_dq_report = self._create_dataset_file_metadata_for_zip(
-                            fp = zipfile, format = "shape")
+                        created_dq_dfs = self._create_dataset_file_dq_report_for_zip(fp = zipfile,
+                                                                                     format = "shape",
+                                                                                     last_modified = dataset_file["LastModified"])
                         sfc = None
                         # could force gc to release memory here, but it's probably not a huge concern
                         gc.collect()
@@ -184,22 +185,28 @@ class Crawler(object):
                         continue
 
                 else:
-                    created_dq_report = self._create_dataset_file_dq_report(bucket = bucket, dataset_file = dataset_file)
+                    created_dq_dfs = self._create_dataset_file_dq_report(bucket = bucket,
+                                                                         dataset_file = dataset_file,
+                                                                         last_modified = dataset_file["LastModified"])
 
-                if created_dq_report is None:
+                if created_dq_dfs is None:
                     self.logger.warning(f"WARNING: unable to create data quality report for dataset file "
                                         f"{dataset_file['Key']}")
                 else:
-                    # TODO collate outputs here
-
-            return csv_data
+                    dq_reports_list.append(created_dq_dfs)
+            # TODO upload this to aws, it's a list of lists where each entry is a dataframe
+            return dq_reports_list
 
     def create_data_quality_for_buckets(self, buckets: list) -> list:
-        # TODO build sprint 4
-        csv_data = []
+        """
+        # TODO - docs
+        :param buckets:
+        :return:
+        """
+        dq_reports_list = []
         for bucket in buckets:
-            csv_data.extend(self.create_data_quality_for_bucket(bucket = bucket))
-        return csv_data
+            dq_reports_list.extend(self.create_data_quality_for_bucket(bucket = bucket))
+        return dq_reports_list
 
     @staticmethod
     def _get_file_extension(dataset_file: dict):
@@ -207,21 +214,22 @@ class Crawler(object):
         return dataset_file_extension
 
     @staticmethod
-    def _create_dataset_file_dq_report_for_zip(fp: str, format: str) -> Union[list, None]:
+    def _create_dataset_file_dq_report_for_zip(fp: str, format: str, last_modified: str) -> Union[list, None]:
         """
         Creates dq report for a zipped dataset saved to a local dir by loading files into memory
 
         Note: only shape file datasets that are zipped are supported by this method
 
         Note: this is a private method, it should only be accessed by the class
-        :param fp:
-        :param format:
-        :return:
+        :param fp: filepath of zip file
+        :param format: format of zip file
+        :return: list - of geodataframes
+                 None - if the zip couldn't be read
         """
         if format == "shape":
             # need to implement once Hasdeep is done
-            some_return = create_shape_data_quality_report(file=fp)
-            return some_return
+            gdf_list = create_shape_data_quality_report(file=fp, last_modified = last_modified)
+            return gdf_list
         else:
             return None
 
@@ -242,7 +250,7 @@ class Crawler(object):
         else:
             return None
 
-    def _create_dataset_file_dq_report(self, bucket: str, dataset_file: dict) -> Union[list, None]:
+    def _create_dataset_file_dq_report(self, bucket: str, dataset_file: dict, last_modified: str) -> Union[list, None]:
         """
         Create dq report for a dataset file, by loading the file into memory
 
@@ -262,7 +270,7 @@ class Crawler(object):
         elif dataset_file_extension == ".json":
             try:
                 # TODO refine this
-                some_return = create_geojson_data_quality_report(file = dataset_file_flo)
+                some_return = create_geojson_data_quality_report(file = dataset_file_flo, last_modified = last_modified)
                 return some_return
 
             except Exception as e:
@@ -283,7 +291,7 @@ class Crawler(object):
 
         elif dataset_file_extension == ".gpkg":
             try:
-                some_retur n= create_gpkg_data_quality_report(file = dataset_file_flo)
+                some_return = create_gpkg_data_quality_report(file = dataset_file_flo, last_modified = last_modified)
                 return some_return
 
             except Exception as e:

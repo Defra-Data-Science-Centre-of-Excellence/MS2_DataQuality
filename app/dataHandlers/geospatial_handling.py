@@ -6,7 +6,7 @@ from os import mkdir, remove
 from typing import Union
 
 
-def create_geospatial_metadata_and_dq(file: bytes, type: str, output: str) -> Union[tuple, list]:
+def create_geospatial_metadata_and_dq(file: Union[bytes, str], type: str, output: str) -> Union[tuple, list]:
     """
     Function to extract headers and rows for all layers from geosaptial data formats and to extract geodataframes
 

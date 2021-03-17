@@ -1,4 +1,5 @@
-from dataHandlers.geospatial_handling import create_geospatial_metadata_and_dq
+from app.dataHandlers.geospatial_handling import create_geospatial_metadata_and_dq
+from app.data_quality import create_dq_reports
 
 
 def create_geojson_metadata(file: bytes) -> tuple:
@@ -14,13 +15,15 @@ def create_geojson_metadata(file: bytes) -> tuple:
     return header_list, num_rows
 
 
-def create_geojson_data_quality_report(file: bytes) -> None:
+def create_geojson_data_quality_report(file: bytes, last_modified: str) -> list:
     """
     Function to return data quality metrics for geojson files
+    :param last_modified:
     :param file: flo bytes
     :return:
     """
     gdf_list = create_geospatial_metadata_and_dq(file, type = "GEOjson", output = "metadata")
-    gdf = gdf_list[0]
-    # this should just return the metrics
-    return None
+    dq_df = create_dq_reports(gdf_list, last_modified)
+    for df in dq_df:
+        print(df)
+    return dq_df

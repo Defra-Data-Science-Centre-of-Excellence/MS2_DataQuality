@@ -8,7 +8,7 @@ import json
 import re
 from functools import lru_cache
 from typing import Union
-from Crawler.CloudDataStorageManager.abc import CloudDataStorageManagerABC
+from app.Crawler.CloudDataStorageManager.abc import CloudDataStorageManagerABC
 
 
 class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
