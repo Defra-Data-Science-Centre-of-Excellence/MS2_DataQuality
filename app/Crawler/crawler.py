@@ -53,8 +53,9 @@ class Crawler(object):
         else:
             csv_data = []
             sfc = None
-
+            id_num = 0
             for dataset_file in dataset_files:
+                id_num += 1
                 self.logger.debug(f"Creating metadata for dataset file {dataset_file['Key']}")
                 dataset_dir_name = dirname(dataset_file["Key"]).split("/")[0]
 
@@ -129,6 +130,8 @@ class Crawler(object):
                                 metadata_row.append(manifest_file[k])
                             elif k in generated_fields.keys():
                                 metadata_row.append(generated_fields[k])
+                            elif k == 'id':
+                                metadata_row.append(id_num)
                             else:
                                 metadata_row.append("")
                         csv_data.append(metadata_row)
