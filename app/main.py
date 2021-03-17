@@ -11,6 +11,8 @@ mode = args.mode
 configPath = args.config
 
 # Configure Logger
+if not os.path.exists("./logs"):
+    os.mkdir("./logs")
 logger = main_aux.create_logger()
 
 # Load config file
