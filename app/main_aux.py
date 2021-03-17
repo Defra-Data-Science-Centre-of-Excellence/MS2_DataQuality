@@ -13,12 +13,16 @@ def create_logger(log_level=logging.INFO):
     """
     logger = logging.getLogger("elmsMetadataDQTool")
     formatter = logging.Formatter(f"[%(asctime)s] - [%(name)s] - [%(levelname)s] - %(message)s")
-
-    handlers = [logging.StreamHandler(), logging.FileHandler(f"logs/elmsMetadata-log-{datetime.now()}")]
-    for handler in handlers:
-        handler.setLevel(log_level)
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+    # Stream handler to print log statements to command line when running script
+    sh = logging.StreamHandler()
+    sh.setLevel(log_level)
+    sh.setFormatter(formatter)
+    logger.addHandler(sh)
+    # File handler to write logs down to DEBUG level to local file on machine that runs the script
+    fh = logging.FileHandler(f"logs/elmsMetadata-log-{datetime.now()}")
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
 
     logger.setLevel(log_level)
     logger.addHandler(handler)
