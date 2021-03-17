@@ -25,13 +25,13 @@ class testShapeFileCollator(TestCase):
 
         for extension in test_extension:
             self.sfc.add_file(file = bytes(uuid4().hex, encoding = "utf-8"), file_extension = extension,
-                              current_dir = "test_dir")
+                              current_dir = "test_dir", file_size = "1000")
             self.assertNotEqual(getattr(self.sfc, f"_{extension.strip('.')}"), None)
 
         try:
             irrelevant_extension = ".csv"
             self.sfc.add_file(file = bytes(uuid4().hex, encoding = "utf-8"), file_extension = irrelevant_extension,
-                              current_dir = "test_dir")
+                              current_dir = "test_dir", file_size = "1000")
         except Exception as e:
             print(e)
             self.fail("add_file failed when passing an irrelevant file extension")
@@ -58,7 +58,7 @@ class testShapeFileCollator(TestCase):
 
         for extension in test_extension:
             self.sfc.add_file(file = bytes(uuid4().hex, encoding = "utf-8"), file_extension = extension,
-                              current_dir = "test_dir")
+                              current_dir = "test_dir", file_size = "1000")
         self.assertEqual(self.sfc.is_complete(), True)
 
     def test_zip_complete_file(self):
@@ -70,9 +70,11 @@ class testShapeFileCollator(TestCase):
 
         for extension in test_extension:
             self.sfc.add_file(file = bytes(uuid4().hex, encoding = "utf-8"), file_extension = extension,
-                              current_dir = "test_dir")
+                              current_dir = "test_dir", file_size = "1000")
 
-        output_loc = self.sfc.zip_complete_file()
+        output_loc, file_size = self.sfc.zip_complete_file()
 
         self.assertEqual(os.path.exists(output_loc), True)
         shutil.rmtree(output_loc)
+
+        self.assertEqual(file_size, "1000")

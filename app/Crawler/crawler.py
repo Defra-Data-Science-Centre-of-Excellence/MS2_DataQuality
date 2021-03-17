@@ -3,7 +3,7 @@ TODO:
     - could this be done in parallel? I think we should use threading
 """
 
-from Crawler.CloudDataStorageManager import CloudDataStorageManager
+from Crawler.CloudDataStorageManager import CloudDataStorageManagerAWS
 from Crawler.CloudDataStorageManager import ShapeFileCollator
 from dataHandlers import *
 from os.path import dirname, splitext
@@ -22,7 +22,7 @@ class Crawler(object):
         Sets up an instance of CloudDataStorageManager to interact with S3 buckets
         """
         self.logger = logger
-        self._cdsm = CloudDataStorageManager(logger=logger, credentials_fp=credentials_fp)
+        self._cdsm = CloudDataStorageManagerAWS(logger=logger, credentials_fp=credentials_fp)
         # TODO link this to main script and have companion file passed in as __init__ param
         self._companion_json = companion
 
@@ -52,15 +52,12 @@ class Crawler(object):
             self.logger.error(f"ERROR: aborting metadata creation for bucket {bucket}")
         else:
             csv_data = []
-            current_dir = dirname(dataset_files[0]["Key"]).split("/")[0]
             sfc = None
-
+            id_num = 0
             for dataset_file in dataset_files:
+                id_num += 1
                 self.logger.debug(f"Creating metadata for dataset file {dataset_file['Key']}")
                 dataset_dir_name = dirname(dataset_file["Key"]).split("/")[0]
-
-                if dataset_dir_name != current_dir:
-                    current_dir = dataset_dir_name
 
                 manifest_directory = f"{dataset_dir_name}/manifest/"
                 manifest_file = self._cdsm.get_manifest_file(bucket=bucket, manifest_directory=manifest_directory)
@@ -73,19 +70,23 @@ class Crawler(object):
                     dataset_file_extension = self._get_file_extension(dataset_file)
 
                     if dataset_file_extension in self._companion_json["shape_file_extensions"]:
-                        shape_file_dir = current_dir
+                        shape_file_dir = dataset_dir_name
                         file = self._cdsm.read_file_from_storage(bucket=bucket, key=dataset_file['Key'])
 
                         if sfc is None:
                             sfc = ShapeFileCollator(dataset_dir=shape_file_dir)
 
-                        sfc.add_file(file = file, file_extension=dataset_file_extension, current_dir = current_dir)
+                        sfc.add_file(file = file,
+                                     file_extension=dataset_file_extension,
+                                     current_dir = dataset_dir_name,
+                                     file_size = dataset_file['Size'])
 
                         if sfc.is_complete():
-                            zipfile = sfc.zip_complete_file()
+                            zipfile, shp_file_size = sfc.zip_complete_file()
                             created_dataset_metadata = self._create_dataset_file_metadata_for_zip(
                                 fp=zipfile, format="shape")
                             sfc = None
+                            dataset_file["Size"] = shp_file_size
                             # could force gc to release memory here, but it's probably not a huge concern
                             gc.collect()
 
@@ -129,6 +130,8 @@ class Crawler(object):
                                 metadata_row.append(manifest_file[k])
                             elif k in generated_fields.keys():
                                 metadata_row.append(generated_fields[k])
+                            elif k == 'id':
+                                metadata_row.append(id_num)
                             else:
                                 metadata_row.append("")
                         csv_data.append(metadata_row)
