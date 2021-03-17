@@ -49,4 +49,4 @@ export_df.to_csv(csv_buffer)
 s3_crawler.export_file(bucket=config['bucket_to_write_to'],
                        export_directory=config['metadata_destination_directory'],
                        export_file_name=f"{config['metadata_file_name']}.csv",
-                       file_data=csv_buffer)
+                       file_data=csv_buffer.getvalue())
