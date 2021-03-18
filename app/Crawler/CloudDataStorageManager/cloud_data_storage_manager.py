@@ -100,32 +100,17 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
         page_iterator = self._list_object_paginator.paginate(Bucket = bucket,
                                                              Prefix = manifest_directory)
         for page in page_iterator:
-            print(page['Contents'])
-            if len(page['Contents']) == 2:
-                count = 0
-
-                for entry in page['Contents']:
-                    count += 1
-
-                    if "manifest.json" in entry["Key"]:
-                        manifest_file = self._load_manifest_file(bucket = bucket,
-                                                                 key = entry["Key"])
-                        return manifest_file
-
-                    else:
-                        # only audit this if both paths have been checked and the manifest file doesn't have the
-                        # expected name and extension
-                        if count == 2:
-                            self.logger.warning(
-                                f"WARNING: could not find manifest file manifest.json in directory "
-                                f"{manifest_directory}")
-
-            # auditing errors for not finding manifest file
-            elif len(page['Contents']) > 2:
-                self.logger.debug(f"WARNING: found more than one manifest file in directory {manifest_directory}")
-
-            else:
-                self.logger.debug(f"WARNING: no manifest file found in directory {manifest_directory}")
+            try:
+                manifest_file = next(self._load_manifest_file(bucket=bucket, key=entry["Key"])
+                                     for entry in page['Contents'] if "manifest.json" in entry["Key"])
+                return manifest_file
+            except StopIteration as e:
+                self.logger.debug(
+                    f"WARNING: could not find manifest file manifest.json in directory {manifest_directory}")
+            except Exception as e:
+                self.logger.debug(f"WARNING: S3 error occurred when searching for manifest.json in "
+                                  f"directory {manifest_directory}")
+                self.logger.debug(e)
 
     def read_file_from_storage(self, bucket: str, key: str) -> bytes:
         """
