@@ -1,35 +1,49 @@
-
 ## Load packages required for Data Quality (DQ) Tool ##
 library('readxl') ## Used to ingest Spreadsheets ##
 library('dplyr') ## Data Manipulation ##
+library('plyr') ## Data Manipulation ##
 library(aws.s3) ## Needed to interact with AWS S3 ##
 library(aws.ec2metadata) ## Needed to interact with AWS S3 ##
 
 Sys.setenv("AWS_DEFAULT_REGION" = 'eu-west-1')
 
 ### GLOBAL SETTINGS ###
-## How many metrics are in the DQ tool (excluding dataset name and column name)? ##
-Metrics = 7 
+## Set up a vector of all eligible column names ##
+Colnames <- c("Column", "Null.pct", "One_character", "Data_types", "Percent",
+              "Uniqueness", "Contains_geom", "LastModified", "Dataset", "ReportGenerated", "FileExt")
+
+###############
+#### LOCAL ####
+###############
 
 ### Loading in local files (placeholder) ##
-Data <- read_excel("Data_quality_2_snapshot_17.3.2021.xlsx")
+do.call_rbind_read.csv <- function(path, pattern = "*.csv") {
+  files = list.files(path, pattern, full.names = TRUE)
+  do.call(rbind.fill, lapply(files, function(x) read.csv(x, stringsAsFactors = FALSE)))
+}
+
+Data <- do.call_rbind_read.csv("./Data")
+
+## Reformat the Date ##
+Data$`Last Modified` <- format(as.Date(substr(Data$`Last Modified`, 1, 10), format="%Y-%m-%d"), '%d-%m-%Y')
 
 ## Filter columns based on global setting Metrics ##
 ## This removes any stray columns and reduces ambiguity ##
-Data <- Data[,c(1:(Metrics+2))] ## Number of metrics + 2 cols for dataset name and column name 
+Data <- Data %>% select(one_of(Colnames))
 
 ## Finds data extension ## 
-Data$Dataset_extension <- gsub(".*\\.", "", Data$Dataset)
+## Data$Dataset_extension <- gsub(".*\\.", "", Data$Dataset)
 
 ## Simplify Dataset Name ##
 ## Assumes data is in a datasetname/data/datasetname.fileextension format 
 ## e.g. farm_wildlife_package_hotspots/data/refdata_owner.farm_wildlife_package_hotspots.gpkg
 
 ## Note, it may be useful to merge in a lookup table between datasets and data dict IDs 
-Data$Dataset <- gsub("/.*", "", Data$Dataset)
+## Data$Dataset <- gsub("/.*", "", Data$Dataset)
 
-## Reformat the Date ##
-Data$`Last Modified` <- format(as.Date(substr(Data$`Last Modified`, 1, 10), format="%Y-%m-%d"), '%d-%m-%Y')
+###############
+##### S3 ######
+###############
 
 ## Loading in all outputs from AWS S3 ##
 ## This will append all datasets in one go ## 

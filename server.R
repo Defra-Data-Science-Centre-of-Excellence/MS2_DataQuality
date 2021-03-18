@@ -27,8 +27,6 @@ server <- function (input, output, session) {
                    arrange(Column) %>% ## Alphabetical order %>%
                    mutate(NA_pct = Rounder(NA_pct, 2))
     
-    ## TO DO: Rename column headers ##
-    
     return(DF)
     
   })
@@ -48,7 +46,11 @@ server <- function (input, output, session) {
   
   output$table  <- DT::renderDataTable(server=FALSE, {
     
-    DT::datatable(Data_filtered(), 
+    DT::datatable(Dataframe <- Data_filtered() %>%
+                  rename(`Percent Missing` = NA_pct,
+                         `Missing alphanumeric` = One_character,
+                         `Data Type` = Data_types,
+                         `Data mismatch` = Percent),
                   rownames = FALSE,
                   extensions = 'Buttons',
                   options = list(
@@ -63,10 +65,10 @@ server <- function (input, output, session) {
                   class = "display" #if you want to modify via .css
     ) %>%
       formatStyle('Column', backgroundColor = '#e6f5ff') %>%
-      formatStyle('NA_pct', backgroundColor = '#e6fff9') %>%
-      formatStyle('One_character', backgroundColor = '#e6fff9') %>% 
-      formatStyle('Data_types', backgroundColor = '#ffe6e6') %>%
-      formatStyle('Percent', backgroundColor = '#ffe6e6') %>%
+      formatStyle('Percent Missing', backgroundColor = '#e6fff9') %>%
+      formatStyle('Missing alphanumeric', backgroundColor = '#e6fff9') %>% 
+      formatStyle('Data Type', backgroundColor = '#ffe6e6') %>%
+      formatStyle('Data mismatch', backgroundColor = '#ffe6e6') %>%
       formatStyle('Last Modified', backgroundColor = '#ffdd99')  
 
       })
