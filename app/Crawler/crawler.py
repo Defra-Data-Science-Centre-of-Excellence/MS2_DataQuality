@@ -118,7 +118,7 @@ class Crawler(object):
                         else:
                             gen_metadata = {"headers": "", "num_rows": "", "geo_layers": ""}
 
-                        generated_fields = {"file_url": dataset_file['Key'],
+                        generated_fields = {"file_url": f"s3://{bucket}/{dataset_file['Key']}",
                                             "data_last_updated": dataset_file['LastModified'],
                                             "column_names": gen_metadata["headers"],
                                             "row_count": gen_metadata["num_rows"],
