@@ -179,13 +179,14 @@ class Crawler(object):
                     if sfc is None:
                         sfc = ShapeFileCollator(dataset_dir = shape_file_dir)
 
-                    sfc.add_file(file = file, file_extension = dataset_file_extension, current_dir = dataset_dir_name)
+                    sfc.add_file(file = file, file_extension = dataset_file_extension, current_dir = dataset_dir_name,
+                                 file_size = dataset_file['Size'])
 
                     if sfc.is_complete():
-                        zipfile = sfc.zip_complete_file()
+                        zipfile, _ = sfc.zip_complete_file()
                         created_dq_dfs = self._create_dataset_file_dq_report_for_zip(fp = zipfile,
                                                                                      format = "shape",
-                                                                                     last_modified = dataset_file["LastModified"])
+                                                                                     dataset_file = dataset_file)
                         sfc = None
                         # could force gc to release memory here, but it's probably not a huge concern
                         gc.collect()
@@ -195,8 +196,7 @@ class Crawler(object):
 
                 else:
                     created_dq_dfs = self._create_dataset_file_dq_report(bucket = bucket,
-                                                                         dataset_file = dataset_file,
-                                                                         last_modified = dataset_file["LastModified"])
+                                                                         dataset_file = dataset_file)
 
                 if created_dq_dfs is None:
                     self.logger.warning(f"WARNING: unable to create data quality report for dataset file "
@@ -226,7 +226,7 @@ class Crawler(object):
         return dataset_file_extension
 
     @staticmethod
-    def _create_dataset_file_dq_report_for_zip(fp: str, format: str, last_modified: str) -> Union[list, None]:
+    def _create_dataset_file_dq_report_for_zip(fp: str, format: str, dataset_file: dict) -> Union[list, None]:
         """
         Creates dq report for a zipped dataset saved to a local dir by loading files into memory
 
@@ -239,7 +239,7 @@ class Crawler(object):
                  None - if the zip couldn't be read
         """
         if format == "shape":
-            df_list = create_shape_data_quality_report(file=fp, last_modified = last_modified)
+            df_list = create_shape_data_quality_report(file=fp, dataset_file = dataset_file)
             return df_list
         else:
             return None
@@ -261,7 +261,7 @@ class Crawler(object):
         else:
             return None
 
-    def _create_dataset_file_dq_report(self, bucket: str, dataset_file: dict, last_modified: str) -> Union[list, None]:
+    def _create_dataset_file_dq_report(self, bucket: str, dataset_file: dict) -> Union[list, None]:
         """
         Create dq report for a dataset file, by loading the file into memory
 
@@ -280,7 +280,7 @@ class Crawler(object):
 
         elif dataset_file_extension == ".json":
             try:
-                df_list = create_geojson_data_quality_report(file = dataset_file_flo, last_modified = last_modified)
+                df_list = create_geojson_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
                 return df_list
 
             except Exception as e:
@@ -292,7 +292,7 @@ class Crawler(object):
         elif dataset_file_extension == ".csv":
             try:
                 # TODO implement this
-                df_list = create_csv_data_quality_report(file = dataset_file_flo)
+                df_list = create_csv_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
                 return df_list
 
             except Exception as e:
@@ -301,7 +301,7 @@ class Crawler(object):
 
         elif dataset_file_extension == ".gpkg":
             try:
-                df_list = create_gpkg_data_quality_report(file = dataset_file_flo, last_modified = last_modified)
+                df_list = create_gpkg_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
                 return df_list
             except Exception as e:
                 self.logger.exception(e)

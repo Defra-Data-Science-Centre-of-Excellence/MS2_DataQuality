@@ -14,12 +14,12 @@ def create_gpkg_metadata(file) -> tuple:
     return create_geospatial_metadata_and_dq(file, type = "gpkg", output = "metadata")
 
 
-def create_gpkg_data_quality_report(file: bytes, last_modified: str) -> list:
+def create_gpkg_data_quality_report(file: bytes, dataset_file: dict) -> list:
     """
     Function to return data quality metrics for gpkg files
     :param file:
     :return:
     """
     gdf_list = create_geospatial_metadata_and_dq(file, type = "gpkg", output = "dq")
-    dq_df = create_dq_reports(gdf_list, last_modified)
+    dq_df = create_dq_reports(gdf_list, dataset_file)
     return dq_df
