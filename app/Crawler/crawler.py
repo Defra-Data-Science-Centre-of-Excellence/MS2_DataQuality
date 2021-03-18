@@ -101,7 +101,7 @@ class Crawler(object):
                     # created metadata back. I think if we remove the else here it should work better
                     if created_dataset_metadata is None:
                         self.logger.debug(f"WARNING: unable to create metadata for dataset file "
-                                            f"{dataset_file['Key']}")
+                                          f"{dataset_file['Key']}")
 
                     else:
                         # here we need to combine the created metadata and the manifest metadata
@@ -117,7 +117,7 @@ class Crawler(object):
                         else:
                             gen_metadata = {"headers": "", "num_rows": "", "geo_layers": ""}
 
-                        generated_fields = {"file_url": dataset_dir_name,
+                        generated_fields = {"file_url": dataset_file['Key'],
                                             "data_last_updated": dataset_file['LastModified'],
                                             "column_names": gen_metadata["headers"],
                                             "row_count": gen_metadata["num_rows"],

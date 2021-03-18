@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-## Code for Metadata and Data Quality Profiling of ELMS data sources in AWS S3 
-=======
 # Metadata Automation Script
 
 This script is designed to automate the creation of a metadata file on the local system the script is run from, and to a specified AWS S3 Bucket that the user has **WRITE** permissions to.
@@ -246,4 +243,3 @@ Requirements vs results
 
 ### User Acceptance Testing
 Requirements vs results
->>>>>>> develop

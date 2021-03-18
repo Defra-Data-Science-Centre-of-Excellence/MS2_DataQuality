@@ -3,6 +3,7 @@ import json
 import sys
 import logging
 from datetime import datetime
+import os
 
 
 def create_logger(log_level=logging.INFO):
@@ -11,6 +12,9 @@ def create_logger(log_level=logging.INFO):
     :param object log_level: logger.[LEVEL] object to set the default level of the logs to display
     :return object logger: Standard python logging object
     """
+    if not os.path.exists("./logs"):
+        os.mkdir("./logs")
+
     logger = logging.getLogger("elmsMetadataDQTool")
     formatter = logging.Formatter(f"[%(asctime)s] - [%(name)s] - [%(levelname)s] - %(message)s")
     # Stream handler to print log statements to command line when running script
@@ -71,5 +75,21 @@ def load_json_file(file_path):
     return file
 
 
+def write_csv_out(logger, config, file):
+    """
+    Writes a Pandas dataframe object to the local file system
+    :param object logger: Logging object
+    :param dict config: The config file loaded as a dictionary
+    :param Dataframe file: Pandas Dataframe object with the data to export as CSV
+    :return: None
+    """
+    if not os.path.exists("./output"):
+        os.mkdir("./output")
+    filename = f"{config['metadata_file_name']}-{datetime.now()}.csv"
+    logger.info(f"Exporting metadata to local file system as {os.getcwd()}/output/{filename}...")
+    file.to_csv(f"./output/{filename}", index=False)
+
+
 def validate_config_file(config):
+    # TODO write function once config file finalised
     pass
