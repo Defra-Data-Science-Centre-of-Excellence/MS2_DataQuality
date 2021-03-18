@@ -100,7 +100,7 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
         page_iterator = self._list_object_paginator.paginate(Bucket = bucket,
                                                              Prefix = manifest_directory)
         for page in page_iterator:
-
+            print(page['Contents'])
             if len(page['Contents']) == 2:
                 count = 0
 
