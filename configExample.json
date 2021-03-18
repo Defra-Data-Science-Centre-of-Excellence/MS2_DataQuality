@@ -1,7 +1,6 @@
 {
-  "buckets_to_read": ["elms-test-1", "elms-test-2"],
-  "bucket_to_write_to": "elms-test-1",
+  "buckets_to_read": ["s3-ranch-20", "s3-staging-area"],
+  "bucket_to_write_to": "s3-staging-area",
   "metadata_file_name": "elms_metadata",
-  "metadata_destination_directory" : "metadata_output",
-  "aws_credentials_json_location": ""
+  "metadata_destination_directory" : "metadata_output"
 }

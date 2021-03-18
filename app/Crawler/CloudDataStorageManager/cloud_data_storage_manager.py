@@ -26,7 +26,7 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
 
     """
 
-    def __init__(self, logger, credentials_fp: str):
+    def __init__(self, logger):
         """
         Constructor
         Sets up
@@ -37,16 +37,9 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
         :param credentials_fp: file path for aws credentials file
         """
         self.logger = logger
-        self.logger.debug("Loading credentials file from directory specified in config file...")
-        with open(credentials_fp) as cf:
-            aws_credentials = json.load(cf)
-        # TODO to remove credentials for final version
-        self._client = boto3.client('s3',
-                                    aws_access_key_id=aws_credentials["aws_access_key_id"],
-                                    aws_secret_access_key=aws_credentials["aws_secret_access_key"])
-        self._s3_resource = boto3.resource('s3',
-                                           aws_access_key_id=aws_credentials["aws_access_key_id"],
-                                           aws_secret_access_key=aws_credentials["aws_secret_access_key"])
+
+        self._client = boto3.client('s3')
+        self._s3_resource = boto3.resource('s3')
         self._list_object_paginator = self._client.get_paginator('list_objects')
 
     def export_file_to_s3(self, bucket, metadata_destination, file_data) -> None:
