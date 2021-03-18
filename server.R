@@ -14,6 +14,13 @@ source('Data_Landing.R')
 
 server <- function (input, output, session) {
   
+  observeEvent(input$Dataset_ext,{
+    
+    updatePickerInput(session,
+                      "Dataset_picker", 
+                      choices=unique(na.omit(Data$Dataset[Data$FileExt==input$Dataset_ext])))
+  })
+  
   Rounder <- function(j, decimal_place){
     rounded <-  round(j, decimal_place)
     return(rounded)
@@ -22,10 +29,10 @@ server <- function (input, output, session) {
   ## Simple reactive function based on the two selection inputs ##
   Data_filtered <- reactive({
     
-    DF <- Data %>% dplyr::filter(Dataset==input$Dataset_picker, Dataset_extension==input$Dataset_ext) %>%
-                   dplyr::select(Column, NA_pct, One_character, Data_types, Percent, `Last Modified`) %>%
+    DF <- Data %>% dplyr::filter(Dataset==input$Dataset_picker, FileExt==input$Dataset_ext) %>%
+                   dplyr::select(Column, Null.pct, One_character, Data_types, Percent, LastModified, ReportGenerated) %>%
                    arrange(Column) %>% ## Alphabetical order %>%
-                   mutate(NA_pct = Rounder(NA_pct, 2))
+                   mutate(Null.pct = Rounder(Null.pct, 2))
     
     return(DF)
     
@@ -34,7 +41,7 @@ server <- function (input, output, session) {
   ## Simple reactive function based on the two selection inputs ##
   Text_filtered <- reactive({
     
-    DF <- Data %>% dplyr::filter(Dataset==input$Dataset_picker, Dataset_extension==input$Dataset_ext) %>%
+    DF <- Data %>% dplyr::filter(Dataset==input$Dataset_picker, FileExt==input$Dataset_ext) %>%
                    dplyr::select(Contains_geom, Uniqueness) %>%
                    mutate(Uniqueness = Rounder(Uniqueness, 2)) %>%
   
@@ -47,10 +54,12 @@ server <- function (input, output, session) {
   output$table  <- DT::renderDataTable(server=FALSE, {
     
     DT::datatable(Dataframe <- Data_filtered() %>%
-                  rename(`Percent Missing` = NA_pct,
+                  dplyr::rename(`Percent Missing` = Null.pct,
                          `Missing alphanumeric` = One_character,
                          `Data Type` = Data_types,
-                         `Data mismatch` = Percent),
+                         `Data mismatch` = Percent,
+                         `Last Modified` = LastModified,
+                         `Report Last Generated` = ReportGenerated),
                   rownames = FALSE,
                   extensions = 'Buttons',
                   options = list(
@@ -58,19 +67,19 @@ server <- function (input, output, session) {
                     autoWidth = TRUE,
                     dom = 'Bfrtip',
                     buttons = c('copy', 'csv', 'excel'),
-                    pageLength = 10,
+                    pageLength = 5,
                     scrollX=TRUE,
                     columnDefs = list(list(className = 'dt-center', targets = "_all"))
                   ),
                   class = "display" #if you want to modify via .css
     ) %>%
-      formatStyle('Column', backgroundColor = '#e6f5ff') %>%
+       formatStyle('Column', backgroundColor = '#e6f5ff') %>%
       formatStyle('Percent Missing', backgroundColor = '#e6fff9') %>%
       formatStyle('Missing alphanumeric', backgroundColor = '#e6fff9') %>% 
       formatStyle('Data Type', backgroundColor = '#ffe6e6') %>%
       formatStyle('Data mismatch', backgroundColor = '#ffe6e6') %>%
-      formatStyle('Last Modified', backgroundColor = '#ffdd99')  
-
+      formatStyle('Last Modified', backgroundColor = '#ffdd99') %>%
+      formatStyle('Report Last Generated', backgroundColor = '#ffdd99')
       })
   
   output$Unique_rows <- renderText({
@@ -83,7 +92,3 @@ server <- function (input, output, session) {
   
   
 }
-
-
-## To do:
-## Observe Event for file types --> file names 

@@ -25,11 +25,12 @@ do.call_rbind_read.csv <- function(path, pattern = "*.csv") {
 Data <- do.call_rbind_read.csv("./Data")
 
 ## Reformat the Date ##
-Data$`Last Modified` <- format(as.Date(substr(Data$`Last Modified`, 1, 10), format="%Y-%m-%d"), '%d-%m-%Y')
+Data$LastModified <- format(as.Date(substr(Data$LastModified, 1, 10), format="%Y-%m-%d"), '%d-%m-%Y')
+Data$ReportGenerated <- format(as.Date(substr(Data$ReportGenerated, 1, 10), format="%m/%d/%Y"), '%d-%m-%Y')
 
 ## Filter columns based on global setting Metrics ##
 ## This removes any stray columns and reduces ambiguity ##
-Data <- Data %>% select(one_of(Colnames))
+Data <- Data %>% dplyr::select(one_of(Colnames))
 
 ## Finds data extension ## 
 ## Data$Dataset_extension <- gsub(".*\\.", "", Data$Dataset)

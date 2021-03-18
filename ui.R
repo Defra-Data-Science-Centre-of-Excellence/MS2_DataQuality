@@ -67,15 +67,15 @@ ui <- dashboardPage( ## Using fluid Page > Dashboard page --> One page dashboard
                           
                           pickerInput("Dataset_picker",
                                       "ELMS Dataset",
-                                      choices = c(unique(Data$Dataset)),
+                                      choices = unique(Data$Dataset),
                                       selected = unique(Data$Dataset)[1],
                                       options = list(`actions-box` = TRUE), multiple = F)), ## F = Do not allow multiple choices 
                    column(width = 5,
                           
                           pickerInput("Dataset_ext",
                                       "File type (extension)",
-                                      choices = c(unique(Data$Dataset_extension)),
-                                      selected = unique(Data$Dataset_extension)[1],
+                                      choices = unique(Data$FileExt),
+                                      selected = unique(Data$FileExt)[1],
                                       options = list(`actions-box` = TRUE), multiple = F)), ## F = Do not allow multiple choices 
                    
                ))),
@@ -86,7 +86,7 @@ ui <- dashboardPage( ## Using fluid Page > Dashboard page --> One page dashboard
     column(width = 6,
     fluidRow(
       width = 12,
-      shiny::h4(strong("Data Quality Report (Exportable) - Top 10 rows")),
+      shiny::h4(strong("Data Quality Report (Exportable) - Top 5 rows")),
       DT::dataTableOutput("table"),
   
     
