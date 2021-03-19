@@ -3,11 +3,12 @@ import fiona
 from uuid import uuid4
 from os.path import exists
 from os import mkdir, remove
+from typing import Union
 
 
-def create_geospatial_metadata(file, type: str) -> tuple:
+def create_geospatial_metadata_and_dq(file: Union[bytes, str], type: str, output: str) -> Union[tuple, list]:
     """
-    Function to extract headers and rows for all layers from geosaptial data formats
+    Function to extract headers and rows for all layers from geosaptial data formats and to extract geodataframes
 
     Supported formats:
         - GeoPackage
@@ -16,12 +17,18 @@ def create_geospatial_metadata(file, type: str) -> tuple:
 
     :param file: File-like object geopackage file
     :param type: File type / format
-    :return: layers       - a list of the layer names, if the file is GEOjson layer is a list of None
+    :param output: either "metadata" or "dq"
+    :return: If output = metadata:
+             layers       - a list of the layer names, if the file is GEOjson layer is a list of None
              headers_list - a list of lists where the list at index n is the list of the headers for the layer at index
                             n of layers
              num_rows     - a list where the value at index n is the number of rows for the layer at the index n
                             of layers
+             OR if output = "dq":
+             gdf_list - a list where each entry is a geodataframe
     """
+    allowed_output = ["metadata", "dq"]
+    assert output in allowed_output, f"Expected output to be either 'metadata' or 'dq' but got {output}"
 
     if type == "GEOjson":
         # convert bytes to string
@@ -48,9 +55,12 @@ def create_geospatial_metadata(file, type: str) -> tuple:
     headers_list = []
     num_rows = []
 
+    gdf_list = []
+
     for layer in all_layers:
         try:
             gdf = geopandas.read_file(file, layer = layer)
+            gdf_list.append(gdf)
             layers.append(layer)
             gdf_col = [col for col in gdf.columns]
             headers_list.append(gdf_col)
@@ -65,4 +75,7 @@ def create_geospatial_metadata(file, type: str) -> tuple:
     elif type == "shp":
         remove(file_to_rm)
 
-    return layers, headers_list, num_rows
+    if output == allowed_output[0]:
+        return layers, headers_list, num_rows
+    elif output == allowed_output[1]:
+        return gdf_list

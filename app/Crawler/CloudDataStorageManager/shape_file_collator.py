@@ -74,7 +74,7 @@ class ShapeFileCollator(object):
 
         files = [(f'{zip_file_output_name}.dbf', io.BytesIO(self._dbf)),
                  (f'{zip_file_output_name}.prj', io.BytesIO(self._prj)),
-                 (f'{zip_file_output_name}shp', io.BytesIO(self._shp)),
+                 (f'{zip_file_output_name}.shp', io.BytesIO(self._shp)),
                  (f'{zip_file_output_name}.shx', io.BytesIO(self._shx))]
 
         with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
