@@ -50,9 +50,10 @@ def create_dq_reports(gdf_list: list, file_dict: dict) -> list:
         if geom_cols:
             contains_geom = True
             observed_geom_types = None
-
+            count = 0
             # BE: loop through every geometry column, not expecting more than one
             for col in geom_cols:
+
                 # BE: get a list of every entry in col
                 geoms = gdf[col].tolist()
                 # BE: get the type of every entry (i.e. Polygon, Multipolygon) -> get the set of this
@@ -61,11 +62,14 @@ def create_dq_reports(gdf_list: list, file_dict: dict) -> list:
                 geom_types = ",".join(geom_types)
                 observed_geom_types = geom_types
                 # BE: check that every geom is valid
-                try:
-                    geom_valid_check = [obj.is_valid for obj in geoms]
-                except Exception as e:
-                    print(e)
-                    geom_valid_check = [False for obj in geoms]
+                geom_valid_check =[]
+
+                for obj in geoms:
+                    try:
+                        geom_valid_check.append(obj.is_valid)
+                    except Exception as e:
+                        geom_valid_check.append(False)
+                    count += 1
 
                 invalid = [str(i) for i, j in enumerate(geom_valid_check) if j is False]
 
@@ -169,7 +173,6 @@ def create_dq_reports(gdf_list: list, file_dict: dict) -> list:
         # Testing to make sure no stray columns have been inserted in the DQ Process ##
         if len(output_df) == len(list(gdf_as_df)):
             gdf_dq_reports.append(output_df)
-            # output_df.to_csv(f"{dirname(file_dict['Key']).replace('/', '_')}.csv", index = False, index_label = False)
         else:
             print(f"ERROR: The output dataframe does not have the same number of columns as the original input file")
 
