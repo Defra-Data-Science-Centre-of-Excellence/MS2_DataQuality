@@ -10,7 +10,7 @@ Sys.setenv("AWS_DEFAULT_REGION" = 'eu-west-1')
 ### GLOBAL SETTINGS ###
 ## Set up a vector of all eligible column names ##
 Colnames <- c("Column", "Null.pct", "One_character", "Data_types", "Percent",
-              "Uniqueness", "Contains_geom", "LastModified", "Dataset", "ReportGenerated", "FileExt")
+              "Uniqueness", "ContainsGeometry", "LastModified", "Dataset", "ReportGenerated", "FileExt")
 
 ###############
 #### LOCAL ####
@@ -22,7 +22,7 @@ do.call_rbind_read.csv <- function(path, pattern = "*.csv") {
   do.call(rbind.fill, lapply(files, function(x) read.csv(x, stringsAsFactors = FALSE)))
 }
 
-Data <- do.call_rbind_read.csv("./Data")
+Data <- do.call_rbind_read.csv("./Data/")
 
 ## Reformat the Date ##
 Data$LastModified <- format(as.Date(substr(Data$LastModified, 1, 10), format="%Y-%m-%d"), '%d-%m-%Y')
@@ -31,6 +31,8 @@ Data$ReportGenerated <- format(as.Date(substr(Data$ReportGenerated, 1, 10), form
 ## Filter columns based on global setting Metrics ##
 ## This removes any stray columns and reduces ambiguity ##
 Data <- Data %>% dplyr::select(one_of(Colnames))
+
+##Data <- NULL
 
 ## Finds data extension ## 
 ## Data$Dataset_extension <- gsub(".*\\.", "", Data$Dataset)

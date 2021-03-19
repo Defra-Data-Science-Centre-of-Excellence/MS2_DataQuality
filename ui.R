@@ -61,8 +61,11 @@ ui <- dashboardPage( ## Using fluid Page > Dashboard page --> One page dashboard
       fluidRow(
         column(width = 12,
                box(title = strong("Choose your dataset and file type"),
+                   span("Note, this tool covers four file types: (1) CSV, (2) GeoJSON, (3) GeoPackage and (4) GIS Shapefiles (.shx)"),
+                   br(),
                    width = 12,
                    status = "success",
+                   br(),
                    column(width = 7,
                           
                           pickerInput("Dataset_picker",
