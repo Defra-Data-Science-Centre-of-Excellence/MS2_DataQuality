@@ -34,8 +34,7 @@ server <- function (input, output, session) {
                    ## ADD NEW COLUMNS HERE WHEN APPROPRIATE ##
                    dplyr::select(Column, Null.pct, One_character, Data_types, Percent, LastModified, ReportGenerated, ContainsGeometry) %>%
                    arrange(Column) %>% ## Alphabetical order %>%
-                   mutate(Null.pct = Rounder(Null.pct, 2)) 
-                   #select_if(~!all(is.na(.))) ## Removes columns if all the rows are NA (i.e. geometry related columns for non geospatial data)
+                   mutate(Null.pct = Rounder(Null.pct, 1)) ## Round to nearest integer 
 
     return(DF)
 
@@ -51,7 +50,8 @@ server <- function (input, output, session) {
                          `Data mismatch` = Percent,
                          `Last Modified` = LastModified,
                          `Report Last Generated` = ReportGenerated) %>%
-                   dplyr::select(-ContainsGeometry),
+                   dplyr::select
+                  (-ContainsGeometry),
                   rownames = FALSE,
                   extensions = 'Buttons',
                   options = list(
@@ -66,13 +66,20 @@ server <- function (input, output, session) {
                   class = "display" #if you want to modify via .css
     ) %>% 
       ## ADD NEW COLUMNS BELOW HERE WHERE APPROPRIATE ##
-      formatStyle('Column', backgroundColor = '#e6f5ff') %>%
-      formatStyle('Percent Missing', backgroundColor = '#e6fff9') %>%
-      formatStyle('Missing alphanumeric', backgroundColor = '#e6fff9') %>%
-      formatStyle('Data Type', backgroundColor = '#ffe6e6') %>%
-      formatStyle('Data mismatch', backgroundColor = '#ffe6e6') %>%
-      formatStyle('Last Modified', backgroundColor = '#ffdd99') %>%
-      formatStyle('Report Last Generated', backgroundColor = '#ffdd99')
+      formatStyle('Column', backgroundColor = '#ffffff') %>%
+      formatStyle('Percent Missing', backgroundColor = '#ffffff') %>%
+      formatStyle('Missing alphanumeric', backgroundColor = '#ffffff') %>%
+      formatStyle('Data Type', backgroundColor = '#ffffff') %>%
+      formatStyle('Data mismatch', backgroundColor = '#ffffff') %>%
+      formatStyle('Last Modified', backgroundColor = '#ffffff') %>%
+      formatStyle('Report Last Generated', backgroundColor = '#ffffff') %>%
+      
+      ## RAG RATING ## 
+      ## https://www.rdocumentation.org/packages/DT/versions/0.17/topics/styleInterval ##
+      formatStyle(
+        'Percent Missing',
+        backgroundColor  = styleInterval(c(5, 10), c('#ccffff', '#ffddcc', '#ff8080'))
+      )
       })
   
 ## Function which returns outputs for geom related inputs and dataframe wide related inputs (e.g. uniqueness) ## 
@@ -102,7 +109,7 @@ Rendertext <- function(column, Text){
     dplyr::select(column) 
   
   if(column=='Uniqueness'){
-    DF <- DF %>% mutate(Uniqueness = Rounder(Uniqueness, 2)) 
+    DF <- DF %>% mutate(Uniqueness = Rounder(Uniqueness, 0)*100)  ## Round to nearest integer 
   }
   
   return(paste0(Text, unique(DF)))

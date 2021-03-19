@@ -89,17 +89,17 @@ ui <- dashboardPage( ## Using fluid Page > Dashboard page --> One page dashboard
     column(width = 6,
     fluidRow(
       width = 12,
-      shiny::h4(strong("Data Quality Report (Exportable) - Top 5 rows")),
+      shiny::h3(strong("Data Quality Report (Exportable) - Top 5 rows")),
       DT::dataTableOutput("table"),
   
     
     
     fluidRow(
-      shiny::h3("Other metrics:"),
-      shiny::h4(textOutput("Unique_rows"), style="color:#b35900"),
-      shiny::h4(textOutput("Contains_geo"), style="color:#009933"),
-      shiny::h4(textOutput("geo_polygon"), style="color:#009933"),
-      shiny::h4(textOutput("geo_invalid"), style="color:#009933")
+      shiny::h3(strong("Other metrics:")),
+      shiny::h4(textOutput("Unique_rows"), style="color:#000000"),
+      shiny::h4(textOutput("Contains_geo"), style="color:#000000"),
+      shiny::h4(textOutput("geo_polygon"), style="color:#000000"),
+      shiny::h4(textOutput("geo_invalid"), style="color:#000000")
     ))),
     
     tags$head(tags$style(HTML('
