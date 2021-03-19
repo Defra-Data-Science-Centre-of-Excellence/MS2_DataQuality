@@ -23,10 +23,10 @@ def create_logger(log_level=logging.INFO):
     sh.setFormatter(formatter)
     logger.addHandler(sh)
     # File handler to write logs down to DEBUG level to local file on machine that runs the script
-    #fh = logging.FileHandler(f"logs/elmsMetadata-log-{datetime.now()}")
-    #fh.setLevel(logging.DEBUG)
-    #fh.setFormatter(formatter)
-    #logger.addHandler(fh)
+    fh = logging.FileHandler(f"logs/elmsMetadata-log-{datetime.now()}")
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
 
     logger.setLevel(logging.DEBUG)
     logger.propagate = False

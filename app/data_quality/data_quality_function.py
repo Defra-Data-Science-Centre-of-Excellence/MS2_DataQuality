@@ -169,7 +169,7 @@ def create_dq_reports(gdf_list: list, file_dict: dict) -> list:
         # Testing to make sure no stray columns have been inserted in the DQ Process ##
         if len(output_df) == len(list(gdf_as_df)):
             gdf_dq_reports.append(output_df)
-            output_df.to_csv(f"{dirname(file_dict['Key']).replace('/', '_')}.csv", index = False, index_label = False)
+            # output_df.to_csv(f"{dirname(file_dict['Key']).replace('/', '_')}.csv", index = False, index_label = False)
         else:
             print(f"ERROR: The output dataframe does not have the same number of columns as the original input file")
 
