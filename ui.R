@@ -95,9 +95,11 @@ ui <- dashboardPage( ## Using fluid Page > Dashboard page --> One page dashboard
     
     
     fluidRow(
-      shiny::h3("Dataset level metrics:"),
+      shiny::h3("Other metrics:"),
       shiny::h4(textOutput("Unique_rows"), style="color:#b35900"),
-      shiny::h4(textOutput("Contains_geo"), style="color:#009933")
+      shiny::h4(textOutput("Contains_geo"), style="color:#009933"),
+      shiny::h4(textOutput("geo_polygon"), style="color:#009933"),
+      shiny::h4(textOutput("geo_invalid"), style="color:#009933")
     ))),
     
     tags$head(tags$style(HTML('

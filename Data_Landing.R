@@ -10,7 +10,8 @@ Sys.setenv("AWS_DEFAULT_REGION" = 'eu-west-1')
 ### GLOBAL SETTINGS ###
 ## Set up a vector of all eligible column names ##
 Colnames <- c("Column", "Null.pct", "One_character", "Data_types", "Percent",
-              "Uniqueness", "ContainsGeometry", "LastModified", "Dataset", "ReportGenerated", "FileExt")
+              "Uniqueness", "ContainsGeometry", "LastModified", "Dataset", "ReportGenerated", "FileExt",
+              "GeomTypesObserved", "InvalidGeometriesAtRows")
 
 ###############
 #### LOCAL ####
