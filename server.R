@@ -116,7 +116,7 @@ output$Contains_geo <- renderText({Rendertext('ContainsGeometry', 'Data contains
 
 output$geo_polygon <- renderText({Rendertext('GeomTypesObserved', 'Geometry Type =')})
 
-output$geo_invalid <- renderText({Rendertext('InvalidGeometriesAtRows', 'Any invalid geometries? = ')})
+output$geo_invalid <- renderText({Rendertext('InvalidGeometriesAtRows', 'Rows with invalid geometries = ')})
 
 }
 
