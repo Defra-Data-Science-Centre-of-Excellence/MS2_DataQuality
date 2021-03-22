@@ -202,8 +202,8 @@ class Crawler(object):
                                         f"{dataset_file['Key']}")
                 else:
                     print(f"Dq report for {dataset_dir_name}")
-                    for dqr in created_dq_data:
-                        print(dqr)
+                    #for dqr in created_dq_data:
+                    # print(dqr)
                     dq_reports_list.append(created_dq_data)
             # TODO upload this to aws, it's a list of lists where each entry is a dataframe
             return dq_reports_list
