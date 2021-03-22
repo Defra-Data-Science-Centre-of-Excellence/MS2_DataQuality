@@ -202,7 +202,7 @@ class Crawler(object):
                                         f"{dataset_file['Key']}")
                 else:
                     print(f"Dq report for {dataset_dir_name}")
-                    #for dqr in created_dq_data:
+                    # for dqr in created_dq_data:
                     # print(dqr)
                     dq_reports_list.append(created_dq_data)
             # TODO upload this to aws, it's a list of lists where each entry is a dataframe
@@ -222,7 +222,7 @@ class Crawler(object):
         for dataset in dq_reports_list:
             for layer in dataset:
                 for rows in layer:
-                    export_list.extend(rows)
+                    export_list.append(rows)
 
         return export_list
 
