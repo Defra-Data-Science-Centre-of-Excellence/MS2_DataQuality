@@ -67,7 +67,7 @@ ui <- dashboardPage(
       fluidRow(
         column(width = 12,
                box(title = strong("Choose your dataset and file type:"),
-                   span("Note, this tool covers four file types: (1) CSV, (2) GeoJSON, (3) GeoPackage and (4) GIS Shapefiles (.shx)"),
+                   span("Note this tool processes the quality metrics associated with 4 types of data file: CSV, GeoJSON, GeoPackage, GIS Shapefiles (.shx)."),
                    br(),
                    width = 12,
                    status = "success",
