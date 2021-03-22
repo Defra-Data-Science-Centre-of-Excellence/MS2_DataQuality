@@ -100,14 +100,14 @@ ui <- dashboardPage(
     column(width = 6,
     fluidRow(
       width = 12,
-      shiny::h3(strong("Data Quality Report (Exportable) - Top 5 rows")),
+      shiny::h3(strong("Metrics at field level (Exportable) - Top 5 rows")),
       DT::dataTableOutput("table"),
   
     ## Outputs metrics for the geometry column and metrics which do not vary across columns 
     ## (eg 'uniqueness' which is a dataframe wide metric)
     
     fluidRow(
-      shiny::h3(strong("Other metrics:")),
+      shiny::h3(strong("Metrics associated with data set:")),
       shiny::h4(textOutput("Unique_rows"), style="color:#000000"),
       shiny::h4(textOutput("Contains_geo"), style="color:#000000"),
       shiny::h4(textOutput("geo_polygon"), style="color:#000000"),
