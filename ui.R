@@ -63,7 +63,7 @@ ui <- dashboardPage(
                                     "here."), br(), br(),
                                    ),
                             strong("Note, this tool evaluates datasets based on their dataset name ('Dataset') and extension ('FileExt'). 
-                                   Dataset names must be unique and the extension must adhere to one of the four file types below")
+                                   Dataset names must be unique and the extension must adhere to one of the four file types below.")
                                    
                             )))),
       

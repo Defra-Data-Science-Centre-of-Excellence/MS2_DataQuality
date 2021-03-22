@@ -64,7 +64,6 @@ server <- function (input, output, session) {
                   rownames = FALSE,
                   extensions = 'Buttons',
                   options = list(
-                    searching = FALSE, ## Disables globalsearch filter
                     fixedColumns = FALSE,
                     autoWidth = TRUE,
                     dom = 'Bfrtip',
