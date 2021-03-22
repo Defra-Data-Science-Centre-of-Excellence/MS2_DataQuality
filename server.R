@@ -82,27 +82,15 @@ server <- function (input, output, session) {
       )
       })
   
-## Function which returns outputs for geom related inputs and dataframe wide related inputs (e.g. uniqueness) ## 
-  Output_metrics <- function(column){
-    
-    DF <- Data %>% dplyr::filter(Dataset==input$Dataset_picker, FileExt==input$Dataset_ext) %>%
-                   dplyr::select(column) 
-    
-    if(column=='Uniqueness'){
-    DF <- DF %>% mutate(Uniqueness = Rounder(Uniqueness, 2)) 
-    }
-      
-    return(DF)
-    
-  }
+## Create function which returns outputs for geom related inputs and dataframe wide 
+## related inputs (e.g. uniqueness) ## 
 
-## Output other metrics ##
 ## For non geospatial data, we will just render an NA 
   
 ## The alternative is to create conditional logic on reactive values/dataframes
 ## which increases the complexity of code 
   
-### Function for rendering text ##
+### Function for rendering outputs = Rendertext ##
 
 Rendertext <- function(column, Text){
   DF <- Data %>% dplyr::filter(Dataset==input$Dataset_picker, FileExt==input$Dataset_ext) %>%

@@ -13,7 +13,7 @@ library(DT)
 
 source('Data_Landing.R')
 
-ui <- dashboardPage( ## Using fluid Page > Dashboard page --> One page dashboard 
+ui <- dashboardPage( 
   
   skin = "green",
   
@@ -105,10 +105,10 @@ ui <- dashboardPage( ## Using fluid Page > Dashboard page --> One page dashboard
     tags$head(tags$style(HTML('
                                 /* body */
                                 .content-wrapper, .right-side {
-                                background-color: #fff5f5;
+                                background-color: #fff5f5; 
                                 }
 
-                                '))))
+                                ')))) ##fff5f5 gives a pink hue to the Shiny dashboard 
     
     
     ))
