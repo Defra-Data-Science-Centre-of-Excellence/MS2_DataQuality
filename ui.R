@@ -11,6 +11,7 @@ library(shinyWidgets) ## Used for more UI friendly drop down menus ##
 library(shinyjs) ## Used to incorporate JS functionality (e.g reset buttons)
 library(DT)
 
+## Import pre-processed data ## 
 source('Data_Landing.R')
 
 ui <- dashboardPage( 
@@ -23,6 +24,11 @@ ui <- dashboardPage(
                      sidebarMenu()),
   
   dashboardBody(
+  ## Generate boxes on the LHS of the App 
+  ## 1 - Information 
+  ## 2 - Documentation 
+  ## 3 - Dropdown menus (which provides interactivity to the App )
+    
   fluidRow(
     column(
       width = 5,
@@ -86,13 +92,19 @@ ui <- dashboardPage(
       
       ),
     
+    ## The UI component of the DQ Report ##
+    ## Each row of 'table' provides metrics for each column in a given dataset 
+    ## Therefore if we have 'M' DQ metrics and 'N' columns in a given dataset, 
+    ## the report/table will have N*(M+1) structure (M+1, includes a column for the column name)
+    
     column(width = 6,
     fluidRow(
       width = 12,
       shiny::h3(strong("Data Quality Report (Exportable) - Top 5 rows")),
       DT::dataTableOutput("table"),
   
-    
+    ## Outputs metrics for the geometry column and metrics which do not vary across columns 
+    ## (eg 'uniqueness' which is a dataframe wide metric)
     
     fluidRow(
       shiny::h3(strong("Other metrics:")),
