@@ -21,7 +21,7 @@ companion = load_json_file(f"{os.getcwd()}/app/script_companion.json")
 
 # Connect to S3 & compute metadata
 logger.debug("Instantiating S3 crawler object...")
-s3_crawler = crawler.Crawler(logger, config['aws_credentials_json_location'], companion)
+s3_crawler = crawler.Crawler(logger, companion)
 logger.info("Starting S3 bucket crawler...")
 metadata = s3_crawler.create_metadata_for_buckets(config['buckets_to_read'])
 
@@ -29,7 +29,7 @@ metadata = s3_crawler.create_metadata_for_buckets(config['buckets_to_read'])
 logger.debug("Building export Dataframe...")
 export_columns = companion["metadata_columns"].values()
 export_df = pd.DataFrame(columns=export_columns, data=metadata)
-export_df['ID'] = export_df.index
+export_df['ID'] = export_df.index + 1
 
 # Export metadata to local file system
 write_csv_out(logger, config, export_df)

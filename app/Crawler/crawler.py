@@ -15,13 +15,13 @@ class Crawler(object):
     Class to crawl through buckets and create metadata or data quality reports
     """
 
-    def __init__(self, logger, credentials_fp: str, companion: dict):
+    def __init__(self, logger, companion: dict):
         """
         Constructor
         Sets up an instance of CloudDataStorageManager to interact with S3 buckets
         """
         self.logger = logger
-        self._cdsm = CloudDataStorageManagerAWS(logger=logger, credentials_fp=credentials_fp)
+        self._cdsm = CloudDataStorageManagerAWS(logger=logger)
         # TODO link this to main script and have companion file passed in as __init__ param
         self._companion_json = companion
 
@@ -117,7 +117,7 @@ class Crawler(object):
                         else:
                             gen_metadata = {"headers": "", "num_rows": "", "geo_layers": ""}
 
-                        generated_fields = {"file_url": dataset_file['Key'],
+                        generated_fields = {"file_url": f"s3://{bucket}/{dataset_file['Key']}",
                                             "data_last_updated": dataset_file['LastModified'],
                                             "column_names": gen_metadata["headers"],
                                             "row_count": gen_metadata["num_rows"],
