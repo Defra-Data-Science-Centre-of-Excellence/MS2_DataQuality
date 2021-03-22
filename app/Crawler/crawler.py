@@ -44,7 +44,6 @@ class Crawler(object):
         :return list csv_data: list of lists containing metadata rows
         """
         dataset_files = self._cdsm.get_dataset_files_list(bucket = bucket)
-
         if dataset_files is None:
             # no bucket exists so we get no returned files
             self.logger.error(f"ERROR: aborting metadata creation for bucket {bucket}. "
@@ -278,47 +277,48 @@ class Crawler(object):
         :return:
         """
         dataset_file_extension = self._get_file_extension(dataset_file)
-        print(dataset_file["Key"])
-        print(dataset_file["Size"])
-        dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
-
-        if dataset_file_extension in self._companion_json["shape_file_extensions"]:
-            self.logger.error(f"ERROR: dataset file is Shape file format, this is currently not supported")
-            return None
-
-        elif dataset_file_extension == ".json":
-            try:
-                df_list = create_geojson_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
-                return df_list
-
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
-                                  f"formats of json files are currently supported")
-                return None
-
-        elif dataset_file_extension == ".csv":
-            try:
-                # TODO implement this
-                df_list = create_csv_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
-                return df_list
-
-            except Exception as e:
-                self.logger.exception(e)
-                return None
-
-        elif dataset_file_extension == ".gpkg":
-            try:
-                df_list = create_gpkg_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
-                return df_list
-            except Exception as e:
-                self.logger.exception(e)
-                return None
-
+        if dataset_file["Size"] > 5000000000:
+            self.logger.error(f"ERROR: file {dataset_file['Key']} too large for script to compute DQ for.")
         else:
-            self.logger.error(f"ERROR: did not recognise file extension {dataset_file_extension} for "
-                              f"file {dataset_file['Key']}")
-            return None
+            dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
+
+            if dataset_file_extension in self._companion_json["shape_file_extensions"]:
+                self.logger.error(f"ERROR: dataset file is Shape file format, this is currently not supported")
+                return None
+
+            elif dataset_file_extension == ".json":
+                try:
+                    df_list = create_geojson_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
+                    return df_list
+
+                except Exception as e:
+                    self.logger.exception(e)
+                    self.logger.error(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
+                                      f"formats of json files are currently supported")
+                    return None
+
+            elif dataset_file_extension == ".csv":
+                try:
+                    # TODO implement this
+                    df_list = create_csv_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
+                    return df_list
+
+                except Exception as e:
+                    self.logger.exception(e)
+                    return None
+
+            elif dataset_file_extension == ".gpkg":
+                try:
+                    df_list = create_gpkg_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
+                    return df_list
+                except Exception as e:
+                    self.logger.exception(e)
+                    return None
+
+            else:
+                self.logger.error(f"ERROR: did not recognise file extension {dataset_file_extension} for "
+                                  f"file {dataset_file['Key']}")
+                return None
 
     def _create_dataset_file_metadata(self, bucket: str, dataset_file: dict) -> Union[list, None]:
         """
@@ -332,45 +332,47 @@ class Crawler(object):
         parsed None is returned
         """
         dataset_file_extension = self._get_file_extension(dataset_file)
-        dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
-
-        if dataset_file_extension in self._companion_json["shape_file_extensions"]:
-            self.logger.debug(f"ERROR: dataset file is Shape file format, this is currently not supported")
-            return None
-
-        elif dataset_file_extension == ".json":
-            try:
-                header_list, num_rows = create_geojson_metadata(file = dataset_file_flo)
-                return [header_list, num_rows]
-
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.debug(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
-                                  f"formats of json files are currently supported")
-                return None
-
-        elif dataset_file_extension == ".csv":
-            try:
-                header_list, num_rows = create_csv_metadata(file = dataset_file_flo)
-                return [header_list, num_rows]
-
-            except Exception as e:
-                self.logger.exception(e)
-                return None
-
-        elif dataset_file_extension == ".gpkg":
-            try:
-                layers, headers_list, num_rows = create_gpkg_metadata(file = dataset_file_flo)
-                return [layers, headers_list, num_rows]
-
-            except Exception as e:
-                self.logger.exception(e)
-                return None
-
+        if dataset_file["Size"] > 5000000000:
+            self.logger.error(f"ERROR: file {dataset_file['Key']} too large for script to compute metadata for.")
         else:
-            self.logger.debug(f"ERROR: did not recognise file extension {dataset_file_extension} for "
-                              f"file {dataset_file['Key']}")
-            return None
+            dataset_file_flo = self._cdsm.read_file_from_storage(bucket=bucket, key=dataset_file["Key"])
+            if dataset_file_extension in self._companion_json["shape_file_extensions"]:
+                self.logger.debug(f"ERROR: dataset file is Shape file format, this is currently not supported")
+                return None
+
+            elif dataset_file_extension == ".json":
+                try:
+                    header_list, num_rows = create_geojson_metadata(file = dataset_file_flo)
+                    return [header_list, num_rows]
+
+                except Exception as e:
+                    self.logger.exception(e)
+                    self.logger.debug(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
+                                      f"formats of json files are currently supported")
+                    return None
+
+            elif dataset_file_extension == ".csv":
+                try:
+                    header_list, num_rows = create_csv_metadata(file = dataset_file_flo)
+                    return [header_list, num_rows]
+
+                except Exception as e:
+                    self.logger.exception(e)
+                    return None
+
+            elif dataset_file_extension == ".gpkg":
+                try:
+                    layers, headers_list, num_rows = create_gpkg_metadata(file = dataset_file_flo)
+                    return [layers, headers_list, num_rows]
+
+                except Exception as e:
+                    self.logger.exception(e)
+                    return None
+
+            else:
+                self.logger.debug(f"ERROR: did not recognise file extension {dataset_file_extension} for "
+                                  f"file {dataset_file['Key']}")
+                return None
 
     def __str__(self):
         return "Crawler Object"
