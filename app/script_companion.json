@@ -35,5 +35,20 @@
     "ms6_delivery_rate": "MS6 - Delivery rate",
     "active": "Historical Row (Active True/False)"
   },
+  "dq_columns": [
+    "Column",
+    "NullPct",
+    "OneCharacter",
+    "DataTypes",
+    "Percent",
+    "Uniqueness",
+    "ContainsGeometry",
+    "LastModified",
+    "Dataset",
+    "ReportGenerated",
+    "FileExt",
+    "GeomTypesObserved",
+    "InvalidGeometriesAtRows"
+  ],
   "shape_file_extensions": [".shp", ".shx", ".shb", ".cpg", ".dbf", ".prj", ".sbn", ".sbx", ".shp.xml"]
 }

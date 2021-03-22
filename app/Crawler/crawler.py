@@ -22,7 +22,6 @@ class Crawler(object):
         """
         self.logger = logger
         self._cdsm = CloudDataStorageManagerAWS(logger=logger)
-        # TODO link this to main script and have companion file passed in as __init__ param
         self._companion_json = companion
 
     def export_file(self, bucket, export_directory, export_file_name, file_data) -> None:
@@ -150,7 +149,7 @@ class Crawler(object):
             csv_data.extend(self.create_metadata_for_bucket(bucket = bucket))
         return csv_data
 
-    def create_data_quality_for_bucket(self, bucket: str) -> list    :
+    def create_data_quality_for_bucket(self, bucket: str) -> list:
         """
         Create dq reports for one bucket
         # TODO - a lot of this is reproduced from create_metadata_for_bucket, we should find a way to reduce
@@ -184,7 +183,7 @@ class Crawler(object):
 
                     if sfc.is_complete():
                         zipfile, _ = sfc.zip_complete_file()
-                        created_dq_dfs = self._create_dataset_file_dq_report_for_zip(fp = zipfile,
+                        created_dq_data = self._create_dataset_file_dq_report_for_zip(fp = zipfile,
                                                                                      format = "shape",
                                                                                      dataset_file = dataset_file)
                         sfc = None
@@ -195,17 +194,17 @@ class Crawler(object):
                         continue
 
                 else:
-                    created_dq_dfs = self._create_dataset_file_dq_report(bucket = bucket,
-                                                                         dataset_file = dataset_file)
+                    created_dq_data = self._create_dataset_file_dq_report(bucket = bucket,
+                                                                          dataset_file = dataset_file)
 
-                if created_dq_dfs is None:
+                if created_dq_data is None:
                     self.logger.warning(f"WARNING: unable to create data quality report for dataset file "
                                         f"{dataset_file['Key']}")
                 else:
                     print(f"Dq report for {dataset_dir_name}")
-                    for dqr in created_dq_dfs:
+                    for dqr in created_dq_data:
                         print(dqr)
-                    dq_reports_list.append(created_dq_dfs)
+                    dq_reports_list.append(created_dq_data)
             # TODO upload this to aws, it's a list of lists where each entry is a dataframe
             return dq_reports_list
 
@@ -218,7 +217,14 @@ class Crawler(object):
         dq_reports_list = []
         for bucket in buckets:
             dq_reports_list.extend(self.create_data_quality_for_bucket(bucket = bucket))
-        return dq_reports_list
+
+        export_list = []
+        for dataset in dq_reports_list:
+            for layer in dataset:
+                for rows in layer:
+                    export_list.extend(rows)
+
+        return export_list
 
     @staticmethod
     def _get_file_extension(dataset_file: dict):

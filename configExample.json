@@ -2,5 +2,7 @@
   "buckets_to_read": ["s3-ranch-020", "s3-staging-area"],
   "bucket_to_write_to": "s3-staging-area",
   "metadata_file_name": "elms_metadata",
-  "metadata_destination_directory" : "metadata_output"
+  "metadata_destination_directory" : "metadata_output",
+  "dq_file_name" : "data_quality_output",
+  "dq_destination_directory": "data_quality_output"
 }

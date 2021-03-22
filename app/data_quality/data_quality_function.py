@@ -19,6 +19,7 @@ def create_dq_reports(gdf_list: list, file_dict: dict) -> list:
     :param file_dict:
     :return: list - of dataframes that are dq reports
     """
+    # TODO add logger
     gdf_dq_reports = []
 
     for gdf in gdf_list:
@@ -169,10 +170,13 @@ def create_dq_reports(gdf_list: list, file_dict: dict) -> list:
                 output_df['InvalidGeometriesAtRows'] = ",".join(invalid)
             else:
                 output_df['InvalidGeometriesAtRows'] = "None Observed"
-
+        else:
+            output_df['GeomTypesObserved'] = "N/A"
+            output_df['InvalidGeometriesAtRows'] = "N/A"
         # Testing to make sure no stray columns have been inserted in the DQ Process ##
         if len(output_df) == len(list(gdf_as_df)):
-            gdf_dq_reports.append(output_df)
+            rows = output_df.values.tolist()
+            gdf_dq_reports.append(rows)
         else:
             print(f"ERROR: The output dataframe does not have the same number of columns as the original input file")
 
