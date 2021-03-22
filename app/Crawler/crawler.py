@@ -278,6 +278,7 @@ class Crawler(object):
         :return:
         """
         dataset_file_extension = self._get_file_extension(dataset_file)
+        print(dataset_file["Key"])
         dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
 
         if dataset_file_extension in self._companion_json["shape_file_extensions"]:
