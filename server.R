@@ -93,7 +93,7 @@ server <- function (input, output, session) {
       
       formatStyle(
         'Percent Missing',
-        backgroundColor  = styleInterval(c(5, 10), c('#ccffff', '#ffddcc', '#ff8080'))
+        backgroundColor  = styleInterval(c(5, 10), c('#28B463', '#F39C12', '#e74c3c'))
       )
       })
   
