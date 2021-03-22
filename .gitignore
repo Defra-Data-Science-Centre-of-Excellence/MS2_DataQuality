@@ -3,6 +3,9 @@
 *.xls
 *.xlsx 
 
+## Unit Testing experimentation
+unit_testing.R
+
 # History files
 .Rhistory
 .Rapp.history
