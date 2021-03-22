@@ -59,10 +59,13 @@ ui <- dashboardPage(
                    status = "success",
                    
                    helpText(strong("Full information on the metrics/rules and dimensions of this Data Quality report are available",
-                                   tags$a(href="https://sp.demeter.zeus.gsi.gov.uk/Sites/aa02/elm/evidanaly/4.9_Workstream_Areas_Modelling_Strategy/4.9.3.12_Modelling_Partner/4.9.3.12.1_Q12021_Capgemini/5.%20Sprint%204/Data%20Quality/Data%20Quality%20Feature%20List.docx?Web=1", 
-                                    "here."),
+                                   tags$a(href="https://sp.demeter.zeus.gsi.gov.uk/Sites/aa02/elm/_layouts/15/WopiFrame.aspx?sourcedoc=/Sites/aa02/elm/evidanaly/4.9_Workstream_Areas_Modelling_Strategy/4.9.3.12_Modelling_Partner/4.9.3.12.1_Q12021_Capgemini/5.%20Sprint%204/Data%20Quality/Data%20Quality%20Feature%20List%20and%20Backlog.docx&action=default", 
+                                    "here."), br(), br(),
+                                   ),
+                            strong("Note, this tool evaluates datasets based on their dataset name ('Dataset') and extension ('FileExt'). 
+                                   Dataset names must be unique and the extension must adhere to one of the four file types below")
                                    
-                            ))))),
+                            )))),
       
       fluidRow(
         column(width = 12,

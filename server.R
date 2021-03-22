@@ -123,7 +123,7 @@ output$Unique_rows <- renderText({Rendertext('Uniqueness', 'Percentage of rows w
   
 output$Contains_geo <- renderText({Rendertext('ContainsGeometry', 'Data contains a geometry column for spatial analysis = ')})
 
-output$geo_polygon <- renderText({Rendertext('GeomTypesObserved', 'Geometry Type =')})
+output$geo_polygon <- renderText({Rendertext('GeomTypesObserved', 'Geometry Type = ')})
 
 output$geo_invalid <- renderText({Rendertext('InvalidGeometriesAtRows', 'Rows with invalid geometries = ')})
 
