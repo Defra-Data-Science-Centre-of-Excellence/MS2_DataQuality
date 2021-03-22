@@ -1,6 +1,6 @@
 import csv
 import pandas as pd
-from app.data_quality import create_dq_reports
+from data_quality import create_dq_reports
 from io import BytesIO
 
 

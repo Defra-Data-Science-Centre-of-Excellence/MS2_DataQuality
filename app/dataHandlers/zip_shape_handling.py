@@ -1,5 +1,5 @@
-from app.dataHandlers.gpkg_handling import create_geospatial_metadata_and_dq
-from app.data_quality import create_dq_reports
+from dataHandlers.gpkg_handling import create_geospatial_metadata_and_dq
+from data_quality import create_dq_reports
 
 
 def create_shape_metadata(file: str):
