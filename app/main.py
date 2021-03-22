@@ -36,7 +36,6 @@ if mode == 'metadata':
 
 elif mode == 'dq':
     dq = s3_crawler.create_data_quality_for_buckets(config['buckets_to_read'])
-    print(dq)
     logger.debug("Building export Dataframe...")
     export_columns = companion["dq_columns"]
     export_df = pd.DataFrame(columns=export_columns, data=dq)
