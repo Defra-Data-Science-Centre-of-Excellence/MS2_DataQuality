@@ -178,6 +178,7 @@ def create_dq_reports(logger, gdf_list: list, file_dict: dict) -> list:
             rows = output_df.values.tolist()
             gdf_dq_reports.append(rows)
         else:
-            logger.debug(f"ERROR: The output dataframe does not have the same number of columns as the original input file")
+            logger.debug(f"ERROR: The output dataframe does not have the "
+                         f"same number of columns as the original input file. Cannot export.")
 
     return gdf_dq_reports

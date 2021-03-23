@@ -184,8 +184,8 @@ class Crawler(object):
                     if sfc.is_complete():
                         zipfile, _ = sfc.zip_complete_file()
                         created_dq_data = self._create_dataset_file_dq_report_for_zip(fp = zipfile,
-                                                                                     format = "shape",
-                                                                                     dataset_file = dataset_file)
+                                                                                      format = "shape",
+                                                                                      dataset_file = dataset_file)
                         sfc = None
                         # could force gc to release memory here, but it's probably not a huge concern
                         gc.collect()
