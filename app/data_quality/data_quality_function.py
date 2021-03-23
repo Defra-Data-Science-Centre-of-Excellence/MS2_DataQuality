@@ -123,6 +123,7 @@ def create_dq_reports(logger, gdf_list: list, file_dict: dict) -> list:
                 # Note, we are using len(Temp[checker]) and not Length, as the removal of NAs may generate a
                 # difference between the two
                 # pct = temp['checker'].sum() / len(temp['checker'])
+                print(temp['checker'].tolist())
                 pct = np.sum(temp['checker'].to_numpy()) / len(temp['checker'].tolist())
 
                 object_type_checker.append([col, pct])
