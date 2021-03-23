@@ -133,8 +133,7 @@ class Crawler(object):
                             else:
                                 metadata_row.append("")
                         csv_data.append(metadata_row)
-                        self.logger.info(f"Successfully processed dataset {dataset_dir_name[0]}........"
-                                         f"{dataset_dir_name[-1]}.{dataset_file['Key'].split('.')[-1]}")
+                        self.logger.info(f"Successfully processed dataset {dataset_file['Key']}.")
             return csv_data
 
     def create_metadata_for_buckets(self, buckets: list) -> list:
@@ -201,9 +200,7 @@ class Crawler(object):
                     self.logger.debug(f"WARNING: unable to create data quality report for dataset file "
                                         f"{dataset_file['Key']}")
                 else:
-                    self.logger.info(f"Data Quality report created for for {dataset_dir_name[0]}"
-                                     f".......{dataset_dir_name[-1]}.")
-                    self.logger.debug(f"Data Quality report created for for {dataset_dir_name}.")
+                    self.logger.info(f"Data Quality report created for for {dataset_dir_name}.")
                     dq_reports_list.append(created_dq_data)
             return dq_reports_list
 
@@ -318,7 +315,7 @@ class Crawler(object):
                     return None
 
             else:
-                self.logger.error(f"ERROR: did not recognise file extension {dataset_file_extension} for "
+                self.logger.debug(f"ERROR: Did not recognise file extension {dataset_file_extension} for "
                                   f"file {dataset_file['Key']}")
                 return None
 

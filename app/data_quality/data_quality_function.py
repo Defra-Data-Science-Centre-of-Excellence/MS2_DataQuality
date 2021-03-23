@@ -138,7 +138,6 @@ def create_dq_reports(logger, gdf_list: list, file_dict: dict) -> list:
                                                       'Data type is set correctly')
 
         except Exception as e:
-
             logger.debug("NOTE: Dataframe does not contain any columns of object type")
 
         # Reset Index in Data Types before Merge

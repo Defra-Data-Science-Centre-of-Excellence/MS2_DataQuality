@@ -50,7 +50,7 @@ def create_geospatial_metadata_and_dq(file: Union[bytes, str], type: str, output
         all_layers = [None]
     else:
         raise ValueError(f"File format {type} not recognised , at present only GEOjson and gpkg file formats "
-                         f"are supported")
+                         f"are supported.")
     layers = []
     headers_list = []
     num_rows = []
