@@ -1,4 +1,5 @@
-from dataHandlers.geospatial_handling import create_geospatial_metadata
+from dataHandlers.geospatial_handling import create_geospatial_metadata_and_dq
+from data_quality import create_dq_reports
 
 
 def create_gpkg_metadata(file) -> tuple:
@@ -10,9 +11,15 @@ def create_gpkg_metadata(file) -> tuple:
                             layer name in layers at the same index
              num_rows - a list where the index of the layer is the number of rows that layer has
     """
-    return create_geospatial_metadata(file, type = "gpkg")
+    return create_geospatial_metadata_and_dq(file, type = "gpkg", output = "metadata")
 
 
-def create_gpkg_data_quality_report(file):
-    # TODO build sprint 4
-    pass
+def create_gpkg_data_quality_report(logger, file: bytes, dataset_file: dict) -> list:
+    """
+    Function to return data quality metrics for gpkg files
+    :param file:
+    :return:
+    """
+    gdf_list = create_geospatial_metadata_and_dq(file, type = "gpkg", output = "dq")
+    dq_df = create_dq_reports(logger, gdf_list, dataset_file)
+    return dq_df

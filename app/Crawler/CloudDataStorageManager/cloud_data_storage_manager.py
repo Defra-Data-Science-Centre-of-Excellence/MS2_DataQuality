@@ -26,7 +26,7 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
 
     """
 
-    def __init__(self, logger, credentials_fp: str):
+    def __init__(self, logger):
         """
         Constructor
         Sets up
@@ -37,16 +37,9 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
         :param credentials_fp: file path for aws credentials file
         """
         self.logger = logger
-        self.logger.debug("Loading credentials file from directory specified in config file...")
-        with open(credentials_fp) as cf:
-            aws_credentials = json.load(cf)
-        # TODO to remove credentials for final version
-        self._client = boto3.client('s3',
-                                    aws_access_key_id=aws_credentials["aws_access_key_id"],
-                                    aws_secret_access_key=aws_credentials["aws_secret_access_key"])
-        self._s3_resource = boto3.resource('s3',
-                                           aws_access_key_id=aws_credentials["aws_access_key_id"],
-                                           aws_secret_access_key=aws_credentials["aws_secret_access_key"])
+
+        self._client = boto3.client('s3')
+        self._s3_resource = boto3.resource('s3')
         self._list_object_paginator = self._client.get_paginator('list_objects')
 
     def export_file_to_s3(self, bucket, metadata_destination, file_data) -> None:
@@ -107,32 +100,17 @@ class CloudDataStorageManagerAWS(CloudDataStorageManagerABC):
         page_iterator = self._list_object_paginator.paginate(Bucket = bucket,
                                                              Prefix = manifest_directory)
         for page in page_iterator:
-
-            if len(page['Contents']) == 2:
-                count = 0
-
-                for entry in page['Contents']:
-                    count += 1
-
-                    if "manifest.json" in entry["Key"]:
-                        manifest_file = self._load_manifest_file(bucket = bucket,
-                                                                 key = entry["Key"])
-                        return manifest_file
-
-                    else:
-                        # only audit this if both paths have been checked and the manifest file doesn't have the
-                        # expected name and extension
-                        if count == 2:
-                            self.logger.warning(
-                                f"WARNING: could not find manifest file manifest.json in directory "
-                                f"{manifest_directory}")
-
-            # auditing errors for not finding manifest file
-            elif len(page['Contents']) > 2:
-                self.logger.debug(f"WARNING: found more than one manifest file in directory {manifest_directory}")
-
-            else:
-                self.logger.debug(f"WARNING: no manifest file found in directory {manifest_directory}")
+            try:
+                manifest_file = next(self._load_manifest_file(bucket, entry["Key"])
+                                     for entry in page['Contents'] if "manifest.json" in entry["Key"])
+                return manifest_file
+            except StopIteration:
+                self.logger.debug(f"WARNING: could not find manifest file manifest.json in "
+                                  f"directory {manifest_directory}")
+            except Exception as e:
+                self.logger.debug(f"WARNING: {manifest_directory}/manifest.json loading error, please check the file "
+                                  f"exists, and is named and formatted correctly. ")
+                self.logger.debug(e)
 
     def read_file_from_storage(self, bucket: str, key: str) -> bytes:
         """

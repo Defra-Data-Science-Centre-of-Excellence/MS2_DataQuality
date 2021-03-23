@@ -194,6 +194,7 @@ Most of the field names are self explanatory, however a number require special i
 - **sharing_agreements_or_copyright_limitations** - List any restrictions or contracts pertaining to data access.
 - **public_access_limitations** - List any restrictions or contracts that affect public access.
 - **data_type** - Indicate nature of the data (i.e. Tabular, Geospatial, Image, etc.)
+- **data_acquired_date** - Date should be in the format **YYYY-MM-DD**
 - **'eo' fields** - True/False fields for if the data is relevant to Environment Objectives.
 - **'ms' fields** - True/False fields for if the data is relevant to certain models.
 
