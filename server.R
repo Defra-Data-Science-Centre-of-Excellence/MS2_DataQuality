@@ -60,7 +60,7 @@ server <- function (input, output, session) {
                          `Report Last Generated` = ReportGenerated) %>%
                    dplyr::select
                   (-ContainsGeometry), ## Not required for the table 
-                  filter='top', selection="multiple", escape=FALSE, ## Enables column specific searching
+                  #filter='top', selection="multiple", escape=FALSE, ## Enables column specific searching
                   rownames = FALSE,
                   extensions = 'Buttons',
                   options = list(
