@@ -14,5 +14,18 @@ Obtained through sessionInfo()
 
 Package          | Version
 -------------    | -------------
+tidyverse        | 1.3.0 
+plotly           | 4.9.3
+shinydashboard   | 0.7.1
+shiny            | 1.6.0 
+shinyWidgets     | 0.5.7
+shinyjs          | 2.0.0
+DT               | 0.17
+readxl           | 1.31
+dplyr            | 1.0.4
+aws.s3           | 0.3.21
+aws.ec2metadata  | 0.2.0
+plyr             | 1.8.6
+
 
 #### Running under: Ubuntu 20.04.2 LTS
