@@ -35,14 +35,14 @@ server <- function (input, output, session) {
     DF <- Data %>% dplyr::filter(Dataset==input$Dataset_picker, FileExt==input$Dataset_ext) %>%
       
                    ## ADD NEW COLUMNS HERE WHEN APPROPRIATE ##
-                   dplyr::select(Column, Null.pct, One_character, Data_types, Percent, LastModified, ReportGenerated, ContainsGeometry) %>%
+                   dplyr::select(Column, NullPct, OneCharacter, DataTypes, Percent, LastModified, ReportGenerated, ContainsGeometry) %>%
                    arrange(Column) %>% ## Alphabetical order %>%
-                   mutate(Null.pct = Rounder(Null.pct, 1)) ## Round to nearest integer 
+                   mutate(NullPct = Rounder(NullPct, 1)) ## Round to nearest integer 
 
     return(DF)
 
   })
-
+  
 ## Render the DQ Report ## 
 ## Note, we are using the DT package here ##
 ## This package provides an R interface to JavaScript DataTables library ##
@@ -52,9 +52,9 @@ server <- function (input, output, session) {
 
     DT::datatable(Dataframe <- Data_filtered() %>%
                   ## RENAME NEW COLUMNS HERE WHEN APPROPRIATE ##
-                  dplyr::rename(`Percent Missing` = Null.pct,
-                         `Missing alphanumeric` = One_character,
-                         `Data Type` = Data_types,
+                  dplyr::rename(`Percent Missing` = NullPct,
+                         `Missing alphanumeric` = OneCharacter,
+                         `Data Type` = DataTypes,
                          `Data mismatch` = Percent,
                          `Last Modified` = LastModified,
                          `Report Last Generated` = ReportGenerated) %>%
