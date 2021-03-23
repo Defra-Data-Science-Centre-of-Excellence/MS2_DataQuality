@@ -159,7 +159,8 @@ class Crawler(object):
 
         if dataset_files is None:
             # no bucket exists so we get no returned files
-            self.logger.error(f"ERROR: aborting data quality report creation for bucket {bucket}")
+            self.logger.error(f"Aborting data quality report creation for bucket {bucket}. "
+                              f"Bucket is empty or does not exist.")
         else:
             dq_reports_list = []
             sfc = None
@@ -197,14 +198,13 @@ class Crawler(object):
                                                                           dataset_file = dataset_file)
 
                 if created_dq_data is None:
-                    self.logger.warning(f"WARNING: unable to create data quality report for dataset file "
+                    self.logger.debug(f"WARNING: unable to create data quality report for dataset file "
                                         f"{dataset_file['Key']}")
                 else:
-                    print(f"Dq report for {dataset_dir_name}")
-                    # for dqr in created_dq_data:
-                    # print(dqr)
+                    self.logger.info(f"Data Quality report created for for {dataset_dir_name[0]}"
+                                     f".......{dataset_dir_name[-1]}.")
+                    self.logger.debug(f"Data Quality report created for for {dataset_dir_name}.")
                     dq_reports_list.append(created_dq_data)
-            # TODO upload this to aws, it's a list of lists where each entry is a dataframe
             return dq_reports_list
 
     def create_data_quality_for_buckets(self, buckets: list) -> list:
@@ -216,13 +216,12 @@ class Crawler(object):
         dq_reports_list = []
         for bucket in buckets:
             dq_reports_list.extend(self.create_data_quality_for_bucket(bucket = bucket))
-
+        self.logger.debug("Compiling data quality rows for export to S3...")
         export_list = []
         for dataset in dq_reports_list:
             for layer in dataset:
                 for rows in layer:
                     export_list.append(rows)
-
         return export_list
 
     @staticmethod
@@ -230,8 +229,7 @@ class Crawler(object):
         _, dataset_file_extension = splitext(dataset_file["Key"])
         return dataset_file_extension
 
-    @staticmethod
-    def _create_dataset_file_dq_report_for_zip(fp: str, format: str, dataset_file: dict) -> Union[list, None]:
+    def _create_dataset_file_dq_report_for_zip(self, fp: str, format: str, dataset_file: dict) -> Union[list, None]:
         """
         Creates dq report for a zipped dataset saved to a local dir by loading files into memory
 
@@ -244,7 +242,7 @@ class Crawler(object):
                  None - if the zip couldn't be read
         """
         if format == "shape":
-            df_list = create_shape_data_quality_report(file=fp, dataset_file = dataset_file)
+            df_list = create_shape_data_quality_report(self.logger, file=fp, dataset_file = dataset_file)
             return df_list
         else:
             return None
@@ -278,29 +276,32 @@ class Crawler(object):
         """
         dataset_file_extension = self._get_file_extension(dataset_file)
         if dataset_file["Size"] > 5000000000:
-            self.logger.error(f"ERROR: file {dataset_file['Key']} too large for script to compute DQ for.")
+            self.logger.warning(f"File {dataset_file['Key']} too large for script to compute DQ for.")
         else:
             dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
 
             if dataset_file_extension in self._companion_json["shape_file_extensions"]:
-                self.logger.error(f"ERROR: dataset file is Shape file format, this is currently not supported")
+                # TODO remove?
+                self.logger.debug(f"ERROR: Dataset file is Shape file format, this is currently not supported")
                 return None
 
             elif dataset_file_extension == ".json":
                 try:
-                    df_list = create_geojson_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
+                    df_list = create_geojson_data_quality_report(self.logger, file = dataset_file_flo,
+                                                                 dataset_file = dataset_file)
                     return df_list
 
                 except Exception as e:
                     self.logger.exception(e)
-                    self.logger.error(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
+                    self.logger.debug(f"ERROR: tried to load file {dataset_file} as GEOjson but failed. Only GEOjson "
                                       f"formats of json files are currently supported")
                     return None
 
             elif dataset_file_extension == ".csv":
                 try:
                     # TODO implement this
-                    df_list = create_csv_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
+                    df_list = create_csv_data_quality_report(self.logger, file = dataset_file_flo,
+                                                             dataset_file = dataset_file)
                     return df_list
 
                 except Exception as e:
@@ -309,7 +310,8 @@ class Crawler(object):
 
             elif dataset_file_extension == ".gpkg":
                 try:
-                    df_list = create_gpkg_data_quality_report(file = dataset_file_flo, dataset_file = dataset_file)
+                    df_list = create_gpkg_data_quality_report(self.logger, file = dataset_file_flo,
+                                                              dataset_file = dataset_file)
                     return df_list
                 except Exception as e:
                     self.logger.exception(e)
@@ -333,7 +335,7 @@ class Crawler(object):
         """
         dataset_file_extension = self._get_file_extension(dataset_file)
         if dataset_file["Size"] > 5000000000:
-            self.logger.error(f"ERROR: file {dataset_file['Key']} too large for script to compute metadata for.")
+            self.logger.warning(f"File {dataset_file['Key']} too large for script to compute metadata for.")
         else:
             dataset_file_flo = self._cdsm.read_file_from_storage(bucket=bucket, key=dataset_file["Key"])
             if dataset_file_extension in self._companion_json["shape_file_extensions"]:

@@ -15,7 +15,7 @@ def create_geojson_metadata(file: bytes) -> tuple:
     return header_list, num_rows
 
 
-def create_geojson_data_quality_report(file: bytes, dataset_file: dict) -> list:
+def create_geojson_data_quality_report(logger, file: bytes, dataset_file: dict) -> list:
     """
     Function to return data quality metrics for geojson files
     :param last_modified:
@@ -23,5 +23,5 @@ def create_geojson_data_quality_report(file: bytes, dataset_file: dict) -> list:
     :return:
     """
     gdf_list = create_geospatial_metadata_and_dq(file, type = "GEOjson", output = "dq")
-    dq_df = create_dq_reports(gdf_list, dataset_file)
+    dq_df = create_dq_reports(logger, gdf_list, dataset_file)
     return dq_df

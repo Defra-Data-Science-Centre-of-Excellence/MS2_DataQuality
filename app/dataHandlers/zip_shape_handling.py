@@ -14,12 +14,12 @@ def create_shape_metadata(file: str):
     return header_list, num_rows
 
 
-def create_shape_data_quality_report(file: str, dataset_file: dict) -> list:
+def create_shape_data_quality_report(logger, file: str, dataset_file: dict) -> list:
     """
     Function to return data quality metrics for zip shp files
     :param file:
     :return:
     """
     gdf_list = create_geospatial_metadata_and_dq(file, type = "shp", output = "dq")
-    dq_df = create_dq_reports(gdf_list, dataset_file)
+    dq_df = create_dq_reports(logger, gdf_list, dataset_file)
     return dq_df

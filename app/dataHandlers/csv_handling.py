@@ -18,12 +18,12 @@ def create_csv_metadata(file: bytes):
     return header_list, num_rows
 
 
-def create_csv_data_quality_report(file: bytes, dataset_file: dict) -> list:
+def create_csv_data_quality_report(logger, file: bytes, dataset_file: dict) -> list:
     """
     Function to load in csv as df
     :param file: CSV files in bytes
     :return:
     """
     df = pd.read_csv(BytesIO(file))
-    dq_df = create_dq_reports(gdf_list = [df], file_dict = dataset_file)
+    dq_df = create_dq_reports(logger, gdf_list = [df], file_dict = dataset_file)
     return dq_df

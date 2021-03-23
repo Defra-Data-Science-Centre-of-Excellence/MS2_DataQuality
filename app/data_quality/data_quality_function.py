@@ -12,7 +12,7 @@ from datetime import datetime
 pd.set_option('mode.chained_assignment', None)
 
 
-def create_dq_reports(gdf_list: list, file_dict: dict) -> list:
+def create_dq_reports(logger, gdf_list: list, file_dict: dict) -> list:
     """
     Create data quality reports for a list of geodataframes
     :param gdf_list: list of geodataframes
@@ -34,8 +34,8 @@ def create_dq_reports(gdf_list: list, file_dict: dict) -> list:
                 full_unique = 1 - (len(gdf) - len(gdf.drop_duplicates())) / len_gdf
             except Exception as e:
                 # BE: I don't think this is necessary
-                print(e)
-                print(f"ERROR: gdf does not contain any rows")
+                logger.debug(e)
+                logger.debug("ERROR: gdf does not contain any rows")
 
         # HS: Note, we could attempt a 'partial' duplication match here, but this would be computationally intensive
         # HS: For example, checking for duplication over 50% of columns = (n)!/0.5n!(n-0.5n)! --> n!/((0.5n)!)^2 -->
@@ -59,7 +59,7 @@ def create_dq_reports(gdf_list: list, file_dict: dict) -> list:
                 geoms = gdf[col].tolist()
                 # BE: get the type of every entry (i.e. Polygon, Multipolygon) -> get the set of this
                 geom_types = set([type(g).__name__ for g in geoms])
-                # BE: create a comma seperated string of the geom types observed
+                # BE: create a comma separated string of the geom types observed
                 geom_types = ",".join(geom_types)
                 observed_geom_types = geom_types
                 # BE: check that every geom is valid
@@ -138,8 +138,8 @@ def create_dq_reports(gdf_list: list, file_dict: dict) -> list:
                                                       'Data type is set correctly')
 
         except Exception as e:
-            print(e)
-            print(f"NOTE: Dataframe does not contain any columns of object type")
+
+            logger.debug("NOTE: Dataframe does not contain any columns of object type")
 
         # Reset Index in Data Types before Merge
         interpreted_dtypes.index.name = 'Column'
@@ -178,6 +178,6 @@ def create_dq_reports(gdf_list: list, file_dict: dict) -> list:
             rows = output_df.values.tolist()
             gdf_dq_reports.append(rows)
         else:
-            print(f"ERROR: The output dataframe does not have the same number of columns as the original input file")
+            logger.debug(f"ERROR: The output dataframe does not have the same number of columns as the original input file")
 
     return gdf_dq_reports
