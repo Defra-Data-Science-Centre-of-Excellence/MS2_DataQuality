@@ -33,19 +33,12 @@ def create_dq_reports(logger, gdf_list: list, file_dict: dict) -> list:
             try:
                 full_unique = 1 - (len(gdf) - len(gdf.drop_duplicates())) / len_gdf
             except Exception as e:
-                # BE: I don't think this is necessary
+                print(e)
                 logger.debug(e)
                 logger.debug("ERROR: gdf does not contain any rows")
 
-        # HS: Note, we could attempt a 'partial' duplication match here, but this would be computationally intensive
-        # HS: For example, checking for duplication over 50% of columns = (n)!/0.5n!(n-0.5n)! --> n!/((0.5n)!)^2 -->
-        # grows exponentially
-
         # ASSESSMENT OF COMPLETENESS
         gdf_as_df = pd.DataFrame(gdf)
-        # BE: is is necessary to convert to pd df, do gdfs not have the same functionality?
-        # col_names = [col for col in gdf_as_df.columns]
-        # BE: we can get geom_cols based on dtypes, much better than dealing with col name
         geom_cols = list(gdf.select_dtypes(include=['geometry']).columns)
 
         if geom_cols:
@@ -96,7 +89,6 @@ def create_dq_reports(logger, gdf_list: list, file_dict: dict) -> list:
         for col in gdf_as_df:
             col_check = ((gdf_as_df[col] == '.') | (gdf_as_df[col] == ',') | (gdf_as_df[col] == '-') | (
                         gdf_as_df[col] == '')).all()
-            # BE: I refactored here to col check, was "Boolean" before. Should avoid use of basic dtypes as var names
             char_1.append([col, col_check])
 
         char_1 = pd.DataFrame(char_1, columns = ['Column', 'One_character'])
@@ -115,16 +107,13 @@ def create_dq_reports(logger, gdf_list: list, file_dict: dict) -> list:
         try:
 
             for col in object_cols:
-                # BE: what is temp?
                 temp = gdf_as_df[gdf_as_df[col].notna()]  # Removes rows which are NA
                 temp['checker'] = temp[col].str.match("\d+")  # TRUE = Only Digits, FALSE = Anything else
 
-                # If Pct = 1, then the object should be a float/integer
-                # Note, we are using len(Temp[checker]) and not Length, as the removal of NAs may generate a
-                # difference between the two
-                # pct = temp['checker'].sum() / len(temp['checker'])
-                print(temp['checker'].tolist())
-                pct = np.sum(temp['checker'].to_numpy()) / len(temp['checker'].tolist())
+                if len(temp['checker']) == 0:
+                    pct = 0
+                else:
+                    pct = temp['checker'].mean()
 
                 object_type_checker.append([col, pct])
 
@@ -140,6 +129,7 @@ def create_dq_reports(logger, gdf_list: list, file_dict: dict) -> list:
                                                       'Data type is set correctly')
 
         except Exception as e:
+            print(e)
             logger.debug("NOTE: Dataframe does not contain any columns of object type")
 
         # Reset Index in Data Types before Merge
@@ -179,6 +169,7 @@ def create_dq_reports(logger, gdf_list: list, file_dict: dict) -> list:
             rows = output_df.values.tolist()
             gdf_dq_reports.append(rows)
         else:
+            pass
             logger.debug(f"ERROR: The output dataframe does not have the "
                          f"same number of columns as the original input file. Cannot export.")
 
