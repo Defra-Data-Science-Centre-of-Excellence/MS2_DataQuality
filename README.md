@@ -94,9 +94,13 @@ The mode and the config path must be entered in the order as above.
 ##### For CONFIG PATH, enter an absolute file path to the config file:
 Example: `C://path/to/config.json`
 
-The resulting command should look like:
+An example of using the metadata mode would be:
 ```
-python3 app/main.py metadata "C://path/to/my/config.json"
+python3 elmMetadataDQTool.py "metadata" "C://path/to/my/config.json"
+```
+And the DQ example:
+```
+python3 elmMetadataDQTool.py "dq" "C://path/to/my/config.json"
 ```
 
 <a name="user-output"></a>
