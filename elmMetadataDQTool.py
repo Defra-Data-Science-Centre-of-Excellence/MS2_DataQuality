@@ -19,7 +19,7 @@ config = load_json_file(args.config)
 validate_config_file(config)
 # Load companion file
 logger.info("Loading companion file...")
-companion = load_json_file(f"{os.getcwd()}/app/script_companion.json")
+companion = load_json_file(f"{os.getcwd()}/scripts/script_companion.json")
 
 # Connect to S3 & compute metadata
 logger.debug("Instantiating S3 crawler object...")
