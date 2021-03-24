@@ -16,6 +16,7 @@ logger = create_logger()
 # Load config file
 logger.info("Loading config file...")
 config = load_json_file(args.config)
+validate_config_file(config)
 # Load companion file
 logger.info("Loading companion file...")
 companion = load_json_file(f"{os.getcwd()}/app/script_companion.json")
