@@ -1,4 +1,4 @@
-from app.dataHandlers import create_gpkg_metadata, create_gpkg_data_quality_report
+from scripts.dataHandlers import create_gpkg_metadata, create_gpkg_data_quality_report
 from unittest import TestCase
 import os
 
@@ -12,7 +12,8 @@ class testGPKGHandler(TestCase):
         Test that the create_csv_metadata_function outputs the list of layers, headers and number of rows
         :return:
         """
-        with open(f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\testData\\test.gpkg", "rb") as f:
+        with open(f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\scripts\\tests\\testData\\test.gpkg",
+                  "rb") as f:
             test_gpkg = f.read()
 
         layers, headers_list, num_rows = create_gpkg_metadata(file = test_gpkg)

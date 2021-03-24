@@ -1,4 +1,4 @@
-from app.dataHandlers import create_shape_metadata
+from scripts.dataHandlers import create_shape_metadata
 from unittest import TestCase
 import os
 import shutil
@@ -18,7 +18,7 @@ class testSHPHandler(TestCase):
         if not os.path.exists("./temp"):
             os.makedirs("./temp")
 
-        test_zip = f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\testData\\test_shape.zip"
+        test_zip = f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\scripts\\tests\\testData\\test_shape.zip"
 
         shutil.copyfile(test_zip, "./temp/test_shape.zip")
 

@@ -1,4 +1,4 @@
-from app.Crawler.CloudDataStorageManager import ShapeFileCollator
+from scripts.Crawler.CloudDataStorageManager import ShapeFileCollator
 from unittest import TestCase
 from uuid import uuid4
 import os

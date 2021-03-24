@@ -131,7 +131,8 @@ Within each dataset folder, the following folders **MUST** exist:
 - `manifest`
 - `data_dictionary` (although this folder will not affect the performance of the script)
 
-The actual dataset should sit within the `data` folder (if there are multiple files like shape files, the structure should be flat, all files within the data folder, with no further sub-directories)
+The actual dataset should sit within the `data` folder (if there are multiple files like shape files, the structure should be flat, all files within the data folder, with no further sub-directories)  
+**Please note** - If there are two file types in the same dataset, first check that one does not compliment the other (i.e. is a schema for the larger file). If they are separate datasets in the same bundle, they should be separated into separate datasets with separate manifest files.
 
 The `manifest` folder should contain only the dataset's `manifest.json` (the file should always be named this). This file is important for the script to pick up information on the dataset relating to uses for modelling and should not be omitted.
 
@@ -198,49 +199,4 @@ Most of the field names are self explanatory, however a number require special i
 - **'eo' fields** - True/False fields for if the data is relevant to Environment Objectives.
 - **'ms' fields** - True/False fields for if the data is relevant to certain models.
 
-## Low Level Design - How the script works
-This element of the readme describes the design elements of the script, and the environment (including S3 bucket structure) it is currently configured to use in AWS.
-
-### Format of the Metadata File
-Based off the ELMS version. Wil require adaptation if CDAP team want to incorporate ELMS data into their template.
-
-### Access Management Approach
-The script relies upon the Virtual Machine (AWS EC2) having the role-based permissions needed to interact with the S3 buckets that the user wishes the script to iterate over.
-Although access to a bucket can be granted to an individual user, granting this permission to a virtual machine allows scripts launched from the VM to interact with other AWS services without having to store access keys on file storage, or in memory.
-
-### S3 Directory Structure
-As mentioned in the file upload guide for S3, Each dataset must have its own directory in the bucket's root directory, and within that, must have the `data`, `manifest` and `data_dictionary` folders.
-The `manifest.json` must be stored in the manifest folder, and the actual data must be stored in the `data` folder.
-
-### Manifest Files
-The manifest files are key for the script to incorporate ELM-specific information into the metadata file. As mentioned above, this file must be added into the `manifest` directory within each dataset's folder, and must **ALWAYS** be named `manifest.json`.
-
-### Crawler Class - Adapter pattern
-Cloud agnostic - abstraction for adapting to another Cloud storage provider
-
-### Companion JSON File
-The `script_companion.json` is a file for storing data pertaining to mapping the metadata output fields, in addition to storing expected file types.
-
-### Suggested Features to Implement Later
-This section details some technical features that are desired to be implemented or improved in future, but could not be built based on time constraints:
-- Trigger-based execution
-- Change Data Capture
-- Temp file write-out
-
-
-## Testing
-This part of the document includes application test planning and results.
-
-### Unit Tests
-Carried out on the code itself to test the underlying logic of functions.
-#### Code Coverage
-Table, explanations
-#### Results
-Requirements vs results
-
-
-### System Integration Testing
-Requirements vs results
-
-### User Acceptance Testing
-Requirements vs results
+A full guide to all the fields in the manifest file is available in the Low-Level Design document.

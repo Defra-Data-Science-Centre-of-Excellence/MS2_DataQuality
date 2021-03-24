@@ -2,7 +2,7 @@ from unittest import TestCase
 import os
 from io import StringIO
 import csv
-from dataHandlers import csv_handling
+from scripts.dataHandlers import csv_handling
 
 
 class testCsvHandling(TestCase):
@@ -14,7 +14,7 @@ class testCsvHandling(TestCase):
         Test that the create_csv_metadata_function outputs the list of headers and the CSV length
         :return:
         """
-        with open(f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\testData\\test.csv") as f:
+        with open(f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\scripts\\tests\\testData\\test.csv") as f:
             test_csv = f.readlines()
         header_list, num_rows = csv_handling.create_csv_metadata(test_csv)
         self.assertEqual(header_list, ['one', 'two', 'three'])

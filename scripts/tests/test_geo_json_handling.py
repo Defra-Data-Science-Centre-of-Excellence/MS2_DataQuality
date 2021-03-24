@@ -1,4 +1,4 @@
-from dataHandlers import create_geojson_metadata, create_geojson_data_quality_report
+from scripts.dataHandlers import create_geojson_metadata, create_geojson_data_quality_report
 from unittest import TestCase
 import os
 
@@ -13,7 +13,8 @@ class testGEOJsonHandler(TestCase):
         Test that the create_csv_metadata_function outputs the list of layers, headers and number of rows
         :return:
         """
-        with open(f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\testData\\test.json", "rb") as f:
+        with open(f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\scripts\\tests\\testData\\test.json",
+                  "rb") as f:
             test_geojson = f.read()
 
         header_list, num_rows = create_geojson_metadata(file = test_geojson)

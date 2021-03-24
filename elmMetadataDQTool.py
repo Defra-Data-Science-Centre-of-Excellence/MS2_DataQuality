@@ -1,5 +1,5 @@
-from main_aux import *
-from Crawler import crawler
+from scripts.main_aux import *
+from scripts.Crawler import crawler
 import os
 import pandas as pd
 from io import StringIO

@@ -2,9 +2,9 @@
 TODO:
     - could this be done in parallel? I think we should use threading
 """
-from Crawler.CloudDataStorageManager import CloudDataStorageManagerAWS
-from Crawler.CloudDataStorageManager import ShapeFileCollator
-from dataHandlers import *
+from scripts.Crawler.CloudDataStorageManager import CloudDataStorageManagerAWS
+from scripts.Crawler.CloudDataStorageManager import ShapeFileCollator
+from scripts.dataHandlers import *
 from os.path import dirname, splitext
 from typing import Union
 import gc
