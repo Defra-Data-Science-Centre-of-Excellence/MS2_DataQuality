@@ -13,6 +13,10 @@ class testShapeFileCollator(TestCase):
     def setUp(self) -> None:
         self.sfc = ShapeFileCollator(dataset_dir = "test_dir")
 
+    def tearDown(self) -> None:
+        if os.path.exists("./temp"):
+            shutil.rmtree("./temp")
+
     def test_add_file(self):
         """
         Test that the create_shape_metadata outputs the headers and number of rows
@@ -77,6 +81,5 @@ class testShapeFileCollator(TestCase):
         output_loc, file_size = self.sfc.zip_complete_file()
 
         self.assertEqual(os.path.exists(output_loc), True)
-        shutil.rmtree(output_loc)
 
         self.assertEqual(file_size, "1000")
