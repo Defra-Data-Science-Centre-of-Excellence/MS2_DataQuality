@@ -140,7 +140,7 @@ class Crawler(object):
     def create_metadata_for_buckets(self, buckets: list) -> list:
         """
         Create metadata for a list of buckets
-        :param buckets:
+        :param buckets: list of buckets
         :return list csv_data: list of lists containing metadata rows from across all buckets specified in the config
         """
         csv_data = []
@@ -151,8 +151,8 @@ class Crawler(object):
     def create_data_quality_for_bucket(self, bucket: str) -> list:
         """
         Create dq reports for one bucket
-        :param bucket:
-        :return:
+        :param bucket: bucket to create dq reports for
+        :return: list of reports
         """
         dataset_files = self._cdsm.get_dataset_files_list(bucket = bucket)
 
@@ -215,8 +215,8 @@ class Crawler(object):
 
     def create_data_quality_for_buckets(self, buckets: list) -> list:
         """
-        :param buckets:
-        :return:
+        :param buckets: list of buckets
+        :return: list
         """
         dq_reports_list = []
         for bucket in buckets:
@@ -261,6 +261,8 @@ class Crawler(object):
         Note: only shape file datasets that are zipped are supported by this method
 
         Note: this is a private method, it should only be accessed by the class
+        :param fp: file path of the zip file
+        :param format: format of what's in the zip
         :return:
         """
         if format == "shape":
@@ -275,8 +277,9 @@ class Crawler(object):
 
         Note: this is a private method, it should only be accessed by the class
 
-        :param bucket:
-        :param dataset_file:
+        :param bucket: bucket the file is in
+        :param dataset_file: dictionary with file information
+        :param dataset_file: dictionary with file information
         :return:
         """
         dataset_file_extension = self._get_file_extension(dataset_file)

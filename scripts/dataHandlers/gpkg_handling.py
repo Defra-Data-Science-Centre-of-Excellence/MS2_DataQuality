@@ -17,8 +17,11 @@ def create_gpkg_metadata(file) -> tuple:
 def create_gpkg_data_quality_report(logger, file: bytes, dataset_file: dict) -> list:
     """
     Function to return data quality metrics for gpkg files
-    :param file:
-    :return:
+    :param logger: a logger object
+    :param file: gpkg files in bytes
+    :param dataset_file: dictionary containing "Key" and "LastModified" where the key is the filepath and last modifed
+    the date the file was last modified
+    :return: a list of lists of lists, containing rows of the dq report
     """
     gdf_list = create_geospatial_metadata_and_dq(file, type = "gpkg", output = "dq")
     dq_df = create_dq_reports(logger, gdf_list, dataset_file)

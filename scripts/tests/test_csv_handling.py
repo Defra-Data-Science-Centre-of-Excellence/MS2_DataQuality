@@ -4,6 +4,7 @@ from scripts.dataHandlers import create_csv_metadata, create_csv_data_quality_re
 import logging
 import pandas as pd
 from scripts.main_aux import load_json_file
+import shutil
 
 
 class testCsvHandling(TestCase):
@@ -19,17 +20,17 @@ class testCsvHandling(TestCase):
         with open(f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\scripts\\tests\\testData\\test.csv", "rb") as f:
             test_csv = f.read()
         self.test_csv = test_csv
-        self.test_dq_df = pd.read_csv(f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\scripts\\tests\\testData\\test_csv_dq.csv")
+        self.test_dq_df = pd.read_csv(
+            f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\scripts\\tests\\testData\\test_csv_dq.csv")
         self.logger = logging.getLogger()
-        json_file = load_json_file(f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\scripts\\script_companion.json")
+        json_file = load_json_file(
+            f"{os.getcwd().split('elmsMetadata')[0]}elmsMetadata\\scripts\\script_companion.json")
         self.dq_cols = json_file["dq_columns"]
-
-        #self.dq_dtypes = {"Column": "object", "NullPct": "float64", "OneCharacter": "object", "DataTypes": "object",
-        #                  "Percent": "object", "Uniqueness": "float64", "ContainsGeometry": "bool", "LastModified": "object",
-        #                  "Dataset": "object", "FileExt": "object", "GeomTypesObserved": "object", "InvalidGeometriesAtRows": "object"}
-        #self.test_dq_df = self.test_dq_df.astype(self.dq_dtypes)
         self.test_dq_df = self.test_dq_df.fillna('N/A')
 
+    def tearDown(self) -> None:
+        if os.path.exists("./logs"):
+            shutil.rmtree("./logs")
 
     def test_create_csv_metadata(self):
         """
@@ -43,8 +44,9 @@ class testCsvHandling(TestCase):
         """
         Test that the create_csv_data_quality_report returns correct result
         """
-        data = create_csv_data_quality_report(logger = self.logger, file = self.test_csv, dataset_file = {"Key": "test_csv/test.csv",
-                                                                          "LastModified": "24/03/21"})
+        data = create_csv_data_quality_report(logger = self.logger, file = self.test_csv,
+                                              dataset_file = {"Key": "test_csv/test.csv",
+                                                              "LastModified": "24/03/21"})
         data = data[0]
 
         df = pd.DataFrame.from_records(data, columns = self.dq_cols)
