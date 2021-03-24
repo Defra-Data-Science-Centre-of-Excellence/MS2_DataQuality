@@ -86,7 +86,7 @@ def write_csv_out(logger, config, file):
     if not os.path.exists("./output"):
         os.mkdir("./output")
     filename = f"{config['metadata_file_name']}-{datetime.now()}.csv"
-    logger.info(f"Exporting metadata to local file system as {os.getcwd()}/output/{filename}...")
+    logger.info(f"Exporting to local file system as {os.getcwd()}/output/{filename}...")
     file.to_csv(f"./output/{filename}", index=False)
 
 
