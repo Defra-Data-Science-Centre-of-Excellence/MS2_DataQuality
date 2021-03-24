@@ -20,9 +20,12 @@ def create_csv_metadata(file: bytes):
 
 def create_csv_data_quality_report(logger, file: bytes, dataset_file: dict) -> list:
     """
-    Function to load in csv as df
+    Function to load in csv as df to create a dq report
+    :param logger: a logger object
     :param file: CSV files in bytes
-    :return:
+    :param dataset_file: dictionary containing "Key" and "LastModified" where the key is the filepath and last modifed
+    the date the file was last modified
+    :return: a list of lists of lists, containing rows of the dq report
     """
     df = pd.read_csv(BytesIO(file))
     dq_df = create_dq_reports(logger, gdf_list = [df], file_dict = dataset_file)

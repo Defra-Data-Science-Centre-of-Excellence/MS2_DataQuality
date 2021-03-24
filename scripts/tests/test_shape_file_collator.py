@@ -42,15 +42,14 @@ class testShapeFileCollator(TestCase):
                           self.sfc.add_file,
                           bytes(uuid4().hex, encoding = "utf-8"),
                           test_extension[0],
-                          "a_different_dir"
+                          "a_different_dir",
+                          "1000"
                           )
 
     def test_is_complete(self):
         """
-
-        :return:
+        Test that the is_complete method works when all required files are passed
         """
-
         test_extension = [".dbf",
                           ".prj",
                           ".shp",
@@ -62,6 +61,9 @@ class testShapeFileCollator(TestCase):
         self.assertEqual(self.sfc.is_complete(), True)
 
     def test_zip_complete_file(self):
+        """
+        test zip functionality in zip_complete_file method
+        """
 
         test_extension = [".dbf",
                           ".prj",

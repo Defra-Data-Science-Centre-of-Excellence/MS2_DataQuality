@@ -1,0 +1,13 @@
+Column,NullPct,OneCharacter,DataTypes,Percent,Uniqueness,ContainsGeometry,LastModified,Dataset,FileExt,GeomTypesObserved,InvalidGeometriesAtRows
+FID,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed
+Name,0.0,Contains at least one alphanumeric character,object,Data type is set correctly,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed
+Opened,0.0,Contains at least one alphanumeric character,object,Data type mismatch: should be converted to numeric,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed
+Start,0.0,Contains at least one alphanumeric character,object,Data type is set correctly,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed
+End_,0.0,Contains at least one alphanumeric character,object,Data type is set correctly,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed
+Length_Km,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed
+Length_Mil,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed
+Updated,0.0,Contains at least one alphanumeric character,object,Data type mismatch: should be converted to numeric,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed
+Last_VR,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed
+GlobalID,0.0,Contains at least one alphanumeric character,object,Data type is set correctly,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed
+SHAPE_Leng,0.0,Contains at least one alphanumeric character,float64,Data type is set correctly,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed
+geometry,0.0,Contains at least one alphanumeric character,geometry,Data type is set correctly,1.0,True,24/03/21,test_shape,.shp,"LineString,MultiLineString",None Observed

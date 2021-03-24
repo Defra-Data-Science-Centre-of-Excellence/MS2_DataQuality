@@ -1,7 +1,3 @@
-"""
-TODO:
-    - could this be done in parallel? I think we should use threading
-"""
 from scripts.Crawler.CloudDataStorageManager import CloudDataStorageManagerAWS
 from scripts.Crawler.CloudDataStorageManager import ShapeFileCollator
 from scripts.dataHandlers import *
@@ -38,7 +34,6 @@ class Crawler(object):
 
     def create_metadata_for_bucket(self, bucket: str) -> list:
         """
-        # TODO - this could be a lot cleaner if we spin stuff out to defs or as private methods, would also help with unit testing
         Create metadata for one bucket
         :param bucket: bucket to create metadata for
         :return list csv_data: list of lists containing metadata rows
@@ -74,10 +69,17 @@ class Crawler(object):
                         if sfc is None:
                             sfc = ShapeFileCollator(dataset_dir=shape_file_dir)
 
-                        sfc.add_file(file = file,
-                                     file_extension=dataset_file_extension,
-                                     current_dir = dataset_dir_name,
-                                     file_size = dataset_file['Size'])
+                        try:
+                            sfc.add_file(file = file,
+                                         file_extension=dataset_file_extension,
+                                         current_dir = dataset_dir_name,
+                                         file_size = dataset_file['Size'])
+                        except ValueError:
+                            sfc = ShapeFileCollator(dataset_dir = shape_file_dir)
+                            sfc.add_file(file = file,
+                                         file_extension = dataset_file_extension,
+                                         current_dir = dataset_dir_name,
+                                         file_size = dataset_file['Size'])
 
                         if sfc.is_complete():
                             zipfile, shp_file_size = sfc.zip_complete_file()
@@ -95,7 +97,6 @@ class Crawler(object):
                         created_dataset_metadata = self._create_dataset_file_metadata(bucket=bucket,
                                                                                       dataset_file=dataset_file)
 
-                    # TODO should this be a if, else??? This way we don't create metadata output files if we don't get
                     # created metadata back. I think if we remove the else here it should work better
                     if created_dataset_metadata is None:
                         self.logger.debug(f"WARNING: unable to create metadata for dataset file "
@@ -139,7 +140,7 @@ class Crawler(object):
     def create_metadata_for_buckets(self, buckets: list) -> list:
         """
         Create metadata for a list of buckets
-        :param buckets:
+        :param buckets: list of buckets
         :return list csv_data: list of lists containing metadata rows from across all buckets specified in the config
         """
         csv_data = []
@@ -150,9 +151,8 @@ class Crawler(object):
     def create_data_quality_for_bucket(self, bucket: str) -> list:
         """
         Create dq reports for one bucket
-        # TODO - a lot of this is reproduced from create_metadata_for_bucket, we should find a way to reduce
-        :param bucket:
-        :return:
+        :param bucket: bucket to create dq reports for
+        :return: list of reports
         """
         dataset_files = self._cdsm.get_dataset_files_list(bucket = bucket)
 
@@ -177,8 +177,17 @@ class Crawler(object):
                     if sfc is None:
                         sfc = ShapeFileCollator(dataset_dir = shape_file_dir)
 
-                    sfc.add_file(file = file, file_extension = dataset_file_extension, current_dir = dataset_dir_name,
-                                 file_size = dataset_file['Size'])
+                    try:
+                        sfc.add_file(file = file,
+                                     file_extension = dataset_file_extension,
+                                     current_dir = dataset_dir_name,
+                                     file_size = dataset_file['Size'])
+                    except ValueError:
+                        sfc = ShapeFileCollator(dataset_dir = shape_file_dir)
+                        sfc.add_file(file = file,
+                                     file_extension = dataset_file_extension,
+                                     current_dir = dataset_dir_name,
+                                     file_size = dataset_file['Size'])
 
                     if sfc.is_complete():
                         zipfile, _ = sfc.zip_complete_file()
@@ -206,9 +215,8 @@ class Crawler(object):
 
     def create_data_quality_for_buckets(self, buckets: list) -> list:
         """
-        # TODO - docs
-        :param buckets:
-        :return:
+        :param buckets: list of buckets
+        :return: list
         """
         dq_reports_list = []
         for bucket in buckets:
@@ -253,6 +261,8 @@ class Crawler(object):
         Note: only shape file datasets that are zipped are supported by this method
 
         Note: this is a private method, it should only be accessed by the class
+        :param fp: file path of the zip file
+        :param format: format of what's in the zip
         :return:
         """
         if format == "shape":
@@ -267,8 +277,9 @@ class Crawler(object):
 
         Note: this is a private method, it should only be accessed by the class
 
-        :param bucket:
-        :param dataset_file:
+        :param bucket: bucket the file is in
+        :param dataset_file: dictionary with file information
+        :param dataset_file: dictionary with file information
         :return:
         """
         dataset_file_extension = self._get_file_extension(dataset_file)
@@ -278,7 +289,6 @@ class Crawler(object):
             dataset_file_flo = self._cdsm.read_file_from_storage(bucket = bucket, key = dataset_file["Key"])
 
             if dataset_file_extension in self._companion_json["shape_file_extensions"]:
-                # TODO remove?
                 self.logger.debug(f"ERROR: Dataset file is Shape file format, this is currently not supported")
                 return None
 
@@ -296,7 +306,6 @@ class Crawler(object):
 
             elif dataset_file_extension == ".csv":
                 try:
-                    # TODO implement this
                     df_list = create_csv_data_quality_report(self.logger, file = dataset_file_flo,
                                                              dataset_file = dataset_file)
                     return df_list

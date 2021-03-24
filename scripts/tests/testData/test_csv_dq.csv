@@ -1,0 +1,4 @@
+Column,NullPct,OneCharacter,DataTypes,Percent,Uniqueness,ContainsGeometry,LastModified,Dataset,FileExt,GeomTypesObserved,InvalidGeometriesAtRows
+one,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,False,24/03/21,test_csv,.csv,N/A,N/A
+two,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,False,24/03/21,test_csv,.csv,N/A,N/A
+three,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,False,24/03/21,test_csv,.csv,N/A,N/A
