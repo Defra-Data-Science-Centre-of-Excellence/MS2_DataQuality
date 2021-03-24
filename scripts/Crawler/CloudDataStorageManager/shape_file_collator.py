@@ -37,7 +37,10 @@ class ShapeFileCollator(object):
         """
         if self.name != current_dir:
             # this is here to throw an error if we start processing multiple datasets at once
-            raise ValueError("Data isnt't being passed to the collator in the expected fashion aborting")
+            raise ValueError(
+                f"Collator got a file from a dataset {current_dir} while trying to collate files for the dataset {self.name}. This is likely happening because of an incompatible directory structure"
+                f"Check the structure of the directory for {self.name}. The collator will abandon it's attempt to collect files for {self.name} and will start to "
+                f"attempt to collate files for {current_dir}")
         else:
             if file_extension == ".dbf":
                 self._dbf = file
