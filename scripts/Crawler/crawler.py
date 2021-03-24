@@ -74,7 +74,8 @@ class Crawler(object):
                                          file_extension=dataset_file_extension,
                                          current_dir = dataset_dir_name,
                                          file_size = dataset_file['Size'])
-                        except ValueError:
+                        except Exception as e:
+                            self.logger.warning(e)
                             sfc = ShapeFileCollator(dataset_dir = shape_file_dir)
                             sfc.add_file(file = file,
                                          file_extension = dataset_file_extension,
@@ -182,7 +183,8 @@ class Crawler(object):
                                      file_extension = dataset_file_extension,
                                      current_dir = dataset_dir_name,
                                      file_size = dataset_file['Size'])
-                    except ValueError:
+                    except Exception as e:
+                        self.logger.warning(e)
                         sfc = ShapeFileCollator(dataset_dir = shape_file_dir)
                         sfc.add_file(file = file,
                                      file_extension = dataset_file_extension,
