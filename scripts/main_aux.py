@@ -93,7 +93,7 @@ def write_csv_out(logger, config, file):
 def validate_config_file(config):
     expected_fields = ["buckets_to_read", "bucket_to_write_to", "metadata_file_name",
                        "metadata_destination_directory", "dq_file_name", "dq_destination_directory"]
-    if config.keys().sort() != expected_fields.sort():
+    if list(config.keys()).sort() != expected_fields.sort():
         print("Invalid Config file format, incorrect keys supplied in JSON. Exiting.")
         sys.exit()
     if not isinstance(config["buckets_to_read"], list):
