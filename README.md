@@ -81,7 +81,7 @@ A template with example values for the config file is included in this repositor
 When running the script, the user must specify the mode they want the script to run (data quality or metadata), in addition to giving the script the location of the metadata file.
 Call the script with the following template:
 ```
-python3 app/main.py [MODE] [CONFIG PATH]
+python3 elmMetadataDQTool.py [MODE] [CONFIG PATH]
 ```
 The mode and the config path must be entered in the order as above.
 
