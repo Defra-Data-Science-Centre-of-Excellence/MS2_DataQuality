@@ -1,6 +1,6 @@
 # Metadata Automation Script
 
-This script is designed to automate the creation of a metadata file on the local system the script is run from, and to a specified AWS S3 Bucket that the user has **WRITE** permissions to.
+This script is designed to automate the creation of a metadata file or a Data Quality report on the local system the script is run from, and to a specified AWS S3 Bucket that the user has **WRITE** permissions to.
 
 ## Table of Contents
 [User Guide](#userguide)

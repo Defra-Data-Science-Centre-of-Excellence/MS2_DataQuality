@@ -34,6 +34,8 @@ if mode == 'metadata':
     export_df['ID'] = export_df.index + 1
     export_file_name = f"{config['metadata_file_name']}.csv"
     export_directory = config["metadata_destination_directory"]
+    # Export metadata to local file system
+    write_csv_out(logger, config, export_df, config['metadata_file_name'])
 
 elif mode == 'dq':
     dq = s3_crawler.create_data_quality_for_buckets(config['buckets_to_read'])
@@ -42,13 +44,12 @@ elif mode == 'dq':
     export_df = pd.DataFrame(columns=export_columns, data=dq)
     export_file_name = f"{config['dq_file_name']}.csv"
     export_directory = config["dq_destination_directory"]
+    # Export DQ to local file system
+    write_csv_out(logger, config, export_df, config['dq_file_name'])
 
 else:
     logger.info("Incorrect mode entered, exiting.")
     sys.exit()
-
-# Export metadata to local file system
-write_csv_out(logger, config, export_df)
 
 # Export file to S3
 csv_buffer = StringIO()

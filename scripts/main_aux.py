@@ -75,7 +75,7 @@ def load_json_file(file_path):
     return file
 
 
-def write_csv_out(logger, config, file):
+def write_csv_out(logger, config, file, file_name):
     """
     Writes a Pandas dataframe object to the local file system
     :param object logger: Logging object
@@ -85,9 +85,9 @@ def write_csv_out(logger, config, file):
     """
     if not os.path.exists("./output"):
         os.mkdir("./output")
-    filename = f"{config['metadata_file_name']}-{datetime.now()}.csv"
-    logger.info(f"Exporting to local file system as {os.getcwd()}/output/{filename}...")
-    file.to_csv(f"./output/{filename}", index=False)
+    full_file_name = f"{file_name}-{datetime.now()}.csv"
+    logger.info(f"Exporting to local file system as {os.getcwd()}/output/{full_file_name}...")
+    file.to_csv(f"./output/{full_file_name}", index=False)
 
 
 def validate_config_file(config):
