@@ -76,12 +76,34 @@ The config file contains the following information:
 
 A template with example values for the config file is included in this repository: `configExample.json` located in the base repository directory.
 
+The config file should look as follows:
+```
+{
+  "buckets_to_read": ["s3-ranch-020", "s3-staging-area"],
+  "bucket_to_write_to": "s3-staging-area",
+  "metadata_file_name": "elms_metadata",
+  "metadata_destination_directory" : "metadata_output",
+  "dq_file_name" : "data_quality_output",
+  "dq_destination_directory": "data_quality_output"
+}
+```
+The following table details what these fields are used for in the scripts:
+
+| Field Name in Config | Description/Usage | Data Type | Example Value(s) |
+|---|---|---|---|
+| buckets_to_read | The names of the S3 buckets to scan and pull metadata/DQ from | Array of Strings | [“your-bucket-1”, “your-bucket-2”] |
+| buckets_to_write_to | The name of the bucket to write metadata/DQ outputs to | String | “s3-staging-area” |
+| metadata_file_name | The name of the output metadata file. *NOTE* - The script automatically adds the ‘.csv’ extension upon export, so this does not need to be in this name | String | “elms_metadata” |
+| metadata_destination_directory | A folder within the target S3 bucket to write the file to. Recommended to keep these in the same place after first creation | String | “folder/within/root/dir” *or* “my_folder_name” |
+| dq_file_name | The name of the output DQ  file. NOTE - The script automatically adds the ‘.csv’ extension upon export, so this does not need to be in this name | String | “data_quality_output” |
+| dq_destination_directory | A folder within the target S3 bucket to write the file to | String | “data_quality_output” |
+
 <a name="user-script"></a>
 ### 3. Calling the Script on the CLI
 When running the script, the user must specify the mode they want the script to run (data quality or metadata), in addition to giving the script the location of the metadata file.
 Call the script with the following template:
 ```
-python3 app/main.py [MODE] [CONFIG PATH]
+python3 elmMetadataDQTool.py [MODE] [CONFIG PATH]
 ```
 The mode and the config path must be entered in the order as above.
 
@@ -94,9 +116,13 @@ The mode and the config path must be entered in the order as above.
 ##### For CONFIG PATH, enter an absolute file path to the config file:
 Example: `C://path/to/config.json`
 
-The resulting command should look like:
+An example of using the metadata mode would be:
 ```
-python3 app/main.py metadata "C://path/to/my/config.json"
+python3 elmMetadataDQTool.py "metadata" "C://path/to/my/config.json"
+```
+And the DQ example:
+```
+python3 elmMetadataDQTool.py "dq" "C://path/to/my/config.json"
 ```
 
 <a name="user-output"></a>
@@ -131,7 +157,8 @@ Within each dataset folder, the following folders **MUST** exist:
 - `manifest`
 - `data_dictionary` (although this folder will not affect the performance of the script)
 
-The actual dataset should sit within the `data` folder (if there are multiple files like shape files, the structure should be flat, all files within the data folder, with no further sub-directories)
+The actual dataset should sit within the `data` folder (if there are multiple files like shape files, the structure should be flat, all files within the data folder, with no further sub-directories)  
+**Please note** - If there are two file types in the same dataset, first check that one does not compliment the other (i.e. is a schema for the larger file). If they are separate datasets in the same bundle, they should be separated into separate datasets with separate manifest files.
 
 The `manifest` folder should contain only the dataset's `manifest.json` (the file should always be named this). This file is important for the script to pick up information on the dataset relating to uses for modelling and should not be omitted.
 
@@ -198,49 +225,4 @@ Most of the field names are self explanatory, however a number require special i
 - **'eo' fields** - True/False fields for if the data is relevant to Environment Objectives.
 - **'ms' fields** - True/False fields for if the data is relevant to certain models.
 
-## Low Level Design - How the script works
-This element of the readme describes the design elements of the script, and the environment (including S3 bucket structure) it is currently configured to use in AWS.
-
-### Format of the Metadata File
-Based off the ELMS version. Wil require adaptation if CDAP team want to incorporate ELMS data into their template.
-
-### Access Management Approach
-The script relies upon the Virtual Machine (AWS EC2) having the role-based permissions needed to interact with the S3 buckets that the user wishes the script to iterate over.
-Although access to a bucket can be granted to an individual user, granting this permission to a virtual machine allows scripts launched from the VM to interact with other AWS services without having to store access keys on file storage, or in memory.
-
-### S3 Directory Structure
-As mentioned in the file upload guide for S3, Each dataset must have its own directory in the bucket's root directory, and within that, must have the `data`, `manifest` and `data_dictionary` folders.
-The `manifest.json` must be stored in the manifest folder, and the actual data must be stored in the `data` folder.
-
-### Manifest Files
-The manifest files are key for the script to incorporate ELM-specific information into the metadata file. As mentioned above, this file must be added into the `manifest` directory within each dataset's folder, and must **ALWAYS** be named `manifest.json`.
-
-### Crawler Class - Adapter pattern
-Cloud agnostic - abstraction for adapting to another Cloud storage provider
-
-### Companion JSON File
-The `script_companion.json` is a file for storing data pertaining to mapping the metadata output fields, in addition to storing expected file types.
-
-### Suggested Features to Implement Later
-This section details some technical features that are desired to be implemented or improved in future, but could not be built based on time constraints:
-- Trigger-based execution
-- Change Data Capture
-- Temp file write-out
-
-
-## Testing
-This part of the document includes application test planning and results.
-
-### Unit Tests
-Carried out on the code itself to test the underlying logic of functions.
-#### Code Coverage
-Table, explanations
-#### Results
-Requirements vs results
-
-
-### System Integration Testing
-Requirements vs results
-
-### User Acceptance Testing
-Requirements vs results
+A full guide to all the fields in the manifest file is available in the Low-Level Design document.

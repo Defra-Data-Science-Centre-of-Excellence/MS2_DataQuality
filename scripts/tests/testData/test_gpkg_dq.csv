@@ -1,0 +1,6 @@
+Column,NullPct,OneCharacter,DataTypes,Percent,Uniqueness,ContainsGeometry,LastModified,Dataset,FileExt,GeomTypesObserved,InvalidGeometriesAtRows
+City,0.0,Contains at least one alphanumeric character,object,Data type is set correctly,1.0,True,24/03/21,test_gpkg,.gpkg,Point,None Observed
+Country,0.0,Contains at least one alphanumeric character,object,Data type is set correctly,1.0,True,24/03/21,test_gpkg,.gpkg,Point,None Observed
+Latitude,0.0,Contains at least one alphanumeric character,float64,Data type is set correctly,1.0,True,24/03/21,test_gpkg,.gpkg,Point,None Observed
+Longitude,0.0,Contains at least one alphanumeric character,float64,Data type is set correctly,1.0,True,24/03/21,test_gpkg,.gpkg,Point,None Observed
+geometry,0.0,Contains at least one alphanumeric character,geometry,Data type is set correctly,1.0,True,24/03/21,test_gpkg,.gpkg,Point,None Observed

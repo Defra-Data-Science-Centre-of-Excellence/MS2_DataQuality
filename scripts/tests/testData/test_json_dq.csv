@@ -1,0 +1,12 @@
+Column,NullPct,OneCharacter,DataTypes,Percent,Uniqueness,ContainsGeometry,LastModified,Dataset,FileExt,GeomTypesObserved,InvalidGeometriesAtRows
+OBJECTID,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,True,24/03/21,test_csv,.csv,MultiLineString,None Observed
+name,0.0,Contains at least one alphanumeric character,object,Data type is set correctly,1.0,True,24/03/21,test_csv,.csv,MultiLineString,None Observed
+opened,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,True,24/03/21,test_csv,.csv,MultiLineString,None Observed
+start,0.0,Contains at least one alphanumeric character,object,Data type is set correctly,1.0,True,24/03/21,test_csv,.csv,MultiLineString,None Observed
+end_,0.0,Contains at least one alphanumeric character,object,Data type is set correctly,1.0,True,24/03/21,test_csv,.csv,MultiLineString,None Observed
+length_km,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,True,24/03/21,test_csv,.csv,MultiLineString,None Observed
+length_mil,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,True,24/03/21,test_csv,.csv,MultiLineString,None Observed
+updated,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,True,24/03/21,test_csv,.csv,MultiLineString,None Observed
+last_vr,0.0,Contains at least one alphanumeric character,int64,Data type is set correctly,1.0,True,24/03/21,test_csv,.csv,MultiLineString,None Observed
+Shape_Length,0.0,Contains at least one alphanumeric character,float64,Data type is set correctly,1.0,True,24/03/21,test_csv,.csv,MultiLineString,None Observed
+geometry,0.0,Contains at least one alphanumeric character,geometry,Data type is set correctly,1.0,True,24/03/21,test_csv,.csv,MultiLineString,None Observed
