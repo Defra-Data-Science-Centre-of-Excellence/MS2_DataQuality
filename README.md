@@ -76,6 +76,28 @@ The config file contains the following information:
 
 A template with example values for the config file is included in this repository: `configExample.json` located in the base repository directory.
 
+The config file should look as follows:
+```
+{
+  "buckets_to_read": ["s3-ranch-020", "s3-staging-area"],
+  "bucket_to_write_to": "s3-staging-area",
+  "metadata_file_name": "elms_metadata",
+  "metadata_destination_directory" : "metadata_output",
+  "dq_file_name" : "data_quality_output",
+  "dq_destination_directory": "data_quality_output"
+}
+```
+The following table details what these fields are used for in the scripts:
+
+| Field Name in Config | Description/Usage | Data Type | Example Value(s) |
+|---|---|---|---|
+| buckets_to_read | The names of the S3 buckets to scan and pull metadata/DQ from | Array of Strings | [“your-bucket-1”, “your-bucket-2”] |
+| buckets_to_write_to | The name of the bucket to write metadata/DQ outputs to | String | “s3-staging-area” |
+| metadata_file_name | The name of the output metadata file. *NOTE* - The script automatically adds the ‘.csv’ extension upon export, so this does not need to be in this name | String | “elms_metadata” |
+| metadata_destination_directory | A folder within the target S3 bucket to write the file to. Recommended to keep these in the same place after first creation | String | “folder/within/root/dir” *or* “my_folder_name” |
+| dq_file_name | The name of the output DQ  file. NOTE - The script automatically adds the ‘.csv’ extension upon export, so this does not need to be in this name | String | “data_quality_output” |
+| dq_destination_directory | A folder within the target S3 bucket to write the file to | String | “data_quality_output” |
+
 <a name="user-script"></a>
 ### 3. Calling the Script on the CLI
 When running the script, the user must specify the mode they want the script to run (data quality or metadata), in addition to giving the script the location of the metadata file.
