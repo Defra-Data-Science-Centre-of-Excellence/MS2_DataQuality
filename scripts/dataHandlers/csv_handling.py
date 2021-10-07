@@ -27,6 +27,6 @@ def create_csv_data_quality_report(logger, file: bytes, dataset_file: dict) -> l
     the date the file was last modified
     :return: a list of lists of lists, containing rows of the dq report
     """
-    df = pd.read_csv(BytesIO(file))
+    df = pd.read_csv(BytesIO(file), engine='python')
     dq_df = create_dq_reports(logger, gdf_list = [df], file_dict = dataset_file)
     return dq_df
