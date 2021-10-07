@@ -157,10 +157,7 @@ def create_dq_reports(logger, gdf_list: list, file_dict: dict) -> list:
 
         if contains_geom:
             output_df['GeomTypesObserved'] = observed_geom_types
-            if invalid:
-                output_df['InvalidGeometriesAtRows'] = ",".join(invalid)
-            else:
-                output_df['InvalidGeometriesAtRows'] = "None Observed"
+            output_df['InvalidGeometriesAtRows'] = invalid!=[]
         else:
             output_df['GeomTypesObserved'] = "N/A"
             output_df['InvalidGeometriesAtRows'] = "N/A"
