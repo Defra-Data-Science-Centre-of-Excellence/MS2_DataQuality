@@ -1,6 +1,12 @@
 # Databricks notebook source
-! pip install geopandas xlrd openpyxl pyreadr
-import os, gc, json
+# MAGIC %pip install -q numexpr bottleneck xlrd openpyxl pyreadr geopandas
+# MAGIC # numexpr, bottleneck:  speeds up numpy.
+# MAGIC # xlrd, openpyxl, pyreadr:  reads xls, xlsx, rds files.
+# MAGIC # geopandas:  [Geo]DataFrames, and installs pandas too.
+
+# COMMAND ----------
+
+import os, json
 from datetime import datetime, timedelta
 import pandas as pd
 import geopandas as gpd
@@ -157,7 +163,6 @@ meta = json.load(open(out+'.json', 'r')) if os.path.exists(out+'.json') and not 
 paths, exts_skipped = get_paths(root, exts, path_limit, banned)
 fails = []
 for i, path in enumerate(paths, 1):
-  break
   if path_limit and path_limit < i:
     break
   print(f'{i:>3}/{len(paths)}\t{path}')
@@ -193,4 +198,4 @@ df.to_csv(out+'.csv', index=False)
 # Output
 print( f'\nLengths  Paths:{len(paths)}  Meta:{len(meta)}  Fails:{len(fails)}' )
 print( exts_skipped )
-#print( *fails, sep='\n' )
+print( *fails, sep='\n' )
