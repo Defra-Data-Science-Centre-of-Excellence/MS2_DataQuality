@@ -5,7 +5,7 @@ library('DT')
 library('dplyr')
 
 
-saveRDS(read.csv('/dbfs/mnt/labr/DSET/DataQuality.csv', check.names=FALSE), 'data/DataQuality.rds')
+# file.copy('/dbfs/mnt/labr/DSET/DataQuality.csv', 'data/DataQuality.rds')
 data <- readRDS('data/DataQuality.rds')
 colgs <- c('Dataset Meta', 'Column Meta', 'Geometry Meta')
 cols <- list(
@@ -32,10 +32,10 @@ ui <- {fluidPage(
         background-color: #eee;
       }
     </style>
-  
+
     # Data Qualities
-    Discover more about data you're interested in.  
-    Contains CDAP data:  /dbfs/mnt/landingr/General Access/  
+    Discover more about data you're interested in.
+    Contains CDAP data:  /dbfs/mnt/landingr/General Access/
     More information and code on [GitHub](https://github.com/Defra-Data-Science-Centre-of-Excellence/MS2_DataQuality).
 
     |      | Definition | Equation |
@@ -61,8 +61,8 @@ ui <- {fluidPage(
     | Geometry Points | Number of coordinates in the geometry |
 
     #### Examples
-    Search *'geometry'* to find all the geospatial columns.  
-    Or search *'status of bathing'* to find that specific column.  
+    Search *'geometry'* to find all the geospatial columns.
+    Or search *'status of bathing'* to find that specific column.
     Or filter columns to unique variants, such as just *'Filepath'* to find the individual files.
   "),
   hr(),
@@ -87,7 +87,7 @@ server <- function(input, output, session) {
         selected <- c(selected, cols[[i]])
     updatePickerInput(session, 'cols', selected=selected)
   })
-  
+
   output$table = renderDataTable(
     data %>%
       select(input$cols) %>%

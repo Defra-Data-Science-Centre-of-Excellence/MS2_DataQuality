@@ -1,18 +1,19 @@
 # Databricks notebook source
 # MAGIC %pip install -q numexpr bottleneck xlrd openpyxl pyreadr geopandas
-# MAGIC # numexpr, bottleneck:  speeds up numpy.
-# MAGIC # xlrd, openpyxl, pyreadr:  reads xls, xlsx, rds files.
+# MAGIC # numexpr, bottleneck:  speed up numpy.
+# MAGIC # xlrd, openpyxl, pyreadr:  read xls, xlsx, rds files.
 # MAGIC # geopandas:  [Geo]DataFrames, and installs pandas too.
 
 # COMMAND ----------
 
-root = '/dbfs/mnt/landingr/General Access/'
-out = '/dbfs/mnt/labr/DSET/DataQuality'  # adds .json and .csv
+root = 's3://s3-ranch-020/'
+out = 'data/DataQuality'  # adds .json and .rds
+s3 = root.startswith('s3')
 
-path_limit = None  # max paths to walk through
+path_limit = 0  # max paths to walk through
 refresh = False  # don't check old metadata output
 recency_timeout = 1  # min mtime-now in hours
-max_filesize = 10 * 1024**3  # maximum file size in bytes
+max_filesize = 1 * 1024**3  # maximum file size in bytes
 
 banned = [
   '/dbfs/mnt/landingr/General Access/EATrialData/HEM_Tool/renv/',  # Unnecessary Data
@@ -24,29 +25,65 @@ exts = [
   '.xlsx', '.xlsm', '.xltx', '.xltm',
   '.rds',
   '.geojson', '.gpkg',
-  '.gdb', '.shp', '.zip',
+  '.gml', '.gdb', '.shp', '.zip',
 ]
 
 # COMMAND ----------
-
 import os, json
 from datetime import datetime, timedelta
 import pandas as pd
 import geopandas as gpd
 import pyreadr
+if s3:
+  from zipfile import ZipFile
+  # from fiona.io import ZipMemoryFile
+  from io import BytesIO
+  import boto3
+  bucket = root.split('/')[-2]
+  Bucket = boto3.resource('s3').Bucket(bucket)
+  S3 = boto3.client('s3')
 
 # COMMAND ----------
 
-def _paths_generator(path):
-  for root, dirs, files in os.walk(path):
-    for file in files:
-      yield os.path.join(root, file)
+def _download_folderobj(path):
+  # zip all files, with the same name and different extensions, from a folder into a memory bytes buffer
+  obj = Bucket.Object(path)
+  root = '/'.join(obj.key.split('/')[:-1])
+  name = obj.key.split('/')[-1].split('.')[0]
+  buffer = BytesIO()
+  with ZipFile('a') as zf:
+    for obj in Bucket.objects.filter(Prefix=root):
+      file = obj.key.split("/")[-1]
+      if file.startswith(name) and not file.endswith('.zip'):
+        with BytesIO() as buffer0:
+          Bucket.Object(obj.key).download_fileobj(buffer0)
+          zf.writestr(file, buffer0.getvalue())
+  return buffer
+
+def get_s3buffer(path):
+  ext = os.path.splitext(path)[1].lower()
+  if ext in ['.gml', '.gdb', '.shp', '.zip']:
+    buffer = _download_folderobj(path)
+  else:
+    buffer = BytesIO(Bucket.Object(path).get()['Body'].read())
+  return buffer
+
+# COMMAND ----------
+
+def _paths_generator(root):
+  if s3:
+    for obj in Bucket.objects.all():
+      yield obj.key
+  else:
+    for path, dirs, files in os.walk(root):
+      for file in files:
+        yield os.path.join(path, file)
 
 def get_paths(root, exts, path_limit, banned):
   paths_kept = list()
   exts_skipped = set()
-  for i, path in enumerate(_paths_generator(root)):
-    if path_limit and path_limit < i:
+  for path in _paths_generator(root):
+    if path_limit and path_limit <= len(paths_kept):
       break
     ext = os.path.splitext(path)[1].lower()
     if not ext in exts:
@@ -55,18 +92,31 @@ def get_paths(root, exts, path_limit, banned):
       pass
     elif any(path.startswith(ban) for ban in banned):
       pass
+    elif s3 and path.split('/')[1]!='data':
+      pass
     else:
       paths_kept.append(path)
   return paths_kept, exts_skipped
 
 # COMMAND ----------
 
+class _s3stat:
+  # imitate os.stat
+  def __init__(self, path):
+    obj = S3.get_object(Bucket=bucket, Key=path)
+    self.st_size = obj['ContentLength']
+    self.st_mtime = obj['LastModified'].timestamp()
+
 def path2meta(path):
-  r = os.stat(path)
+  if s3:
+    r = _s3stat(path)
+  else:
+    r = os.stat(path)
+  file = path.replace(root, '')
   return {
-    'Dataset Name': path.replace(root, '').split('/')[0],
-    'Filepath': path,
-    'File Extension': os.path.splitext(path)[1].lower(),
+    'Dataset Name': file.split('/')[0],
+    'Filepath': root + file,
+    'File Extension': os.path.splitext(file)[1].lower(),
     'File Size (Bytes)': r.st_size,
     'Date Modified': datetime.fromtimestamp(r.st_mtime).isoformat(' ', 'minutes'),
   }
@@ -74,20 +124,29 @@ def path2meta(path):
 # COMMAND ----------
 
 def get_df(path):
-  # No S3 support, use buffer and zipbuffer
   ext = os.path.splitext(path)[1].lower()
+  # S3 Support by loading file/folder into memory
+  if s3:
+    obj = get_s3buffer(path)
+  else:
+    obj = path
+  # Load Data
   if ext in ['.csv']:
-    df = pd.read_csv(path, engine='python')
+    df = pd.read_csv(obj, engine='python')
   elif ext in ['.xls']:
-    df = pd.read_excel(path, engine='xlrd')
+    df = pd.read_excel(obj, engine='xlrd')
   elif ext in ['.xlsx', '.xlsm', '.xltx', '.xltm']:
-    df = pd.read_excel(path, engine='openpyxl')
+    df = pd.read_excel(obj, engine='openpyxl')
   elif ext in ['.rds']:
-    df = pyreadr.read_r(path)[None]
+    df = pyreadr.read_r(obj)[None]
   elif ext in ['.geojson', '.gpkg']:
-    df = gpd.read_file(path)
-  elif ext in ['.gdb', '.shp', '.zip']:
-    df = gpd.read_file(path, driver='ESRI Shapefile')
+    df = gpd.read_file(obj)
+  elif ext in ['.gml']:
+    df = gpd.read_file(obj, driver='GML')
+  elif ext in ['.gdb']:
+    df = gpd.read_file(obj, driver='OpenFileGDB')
+  elif ext in ['.shp', '.zip']:
+    df = gpd.read_file(obj, driver='ESRI Shapefile')
   return df
 
 # COMMAND ----------
@@ -165,8 +224,6 @@ meta = json.load(open(out+'.json', 'r')) if os.path.exists(out+'.json') and not 
 paths, exts_skipped = get_paths(root, exts, path_limit, banned)
 fails = []
 for i, path in enumerate(paths, 1):
-  if path_limit and path_limit < i:
-    break
   print(f'{i:>3}/{len(paths)}\t{path}')
   m1 = path2meta(path)
   try:
@@ -190,16 +247,16 @@ json.dump(meta, open(out+'.json', 'w'))
 # COMMAND ----------
 
 df = pd.merge(
-  pd.json_normalize(meta.copy().values()).drop('COLUMNS', 1),  # file meta
+  pd.json_normalize(meta.copy().values()).drop(columns='COLUMNS', axis=1),  # file meta
   pd.json_normalize(meta.values(), record_path='COLUMNS', meta='Filepath'),  # column meta
   on = 'Filepath'
 )
 first_cols = ['Dataset Name', 'Column Name', 'Filepath', 'File Extension', 'File Size (Bytes)', 'Date Modified', 'Report Time', 'Data Type', 'Number of Columns', 'Number of Rows', 'Completeness', 'Uniqueness', 'Complete', 'Unique', 'Contains AlphaNumeric', 'Coordinate Reference System', 'Geometry Types', 'Geometry Validity', 'Geometry Points']
 df = df[first_cols + [col for col in df if col not in first_cols]]
-df.to_csv(out+'.csv', index=False)
+pyreadr.write_rds(out+'.rds', df)
 
 # COMMAND ----------
 
 print( f'\nLengths  Paths:{len(paths)}  Meta:{len(meta)}  Fails:{len(fails)}' )
 print( exts_skipped )
-print( *fails, sep='\n' )
+# print( *fails, sep='\n' )
