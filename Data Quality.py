@@ -6,6 +6,29 @@
 
 # COMMAND ----------
 
+root = '/dbfs/mnt/landingr/General Access/'
+out = '/dbfs/mnt/labr/DSET/DataQuality'  # adds .json and .csv
+
+path_limit = None  # max paths to walk through
+refresh = False  # don't check old metadata output
+recency_timeout = 1  # min mtime-now in hours
+max_filesize = 10 * 1024**3  # maximum file size in bytes
+
+banned = [
+  '/dbfs/mnt/landingr/General Access/EATrialData/HEM_Tool/renv/',  # Unnecessary Data
+  '/dbfs/mnt/landingr/General Access/TheSolent/TheSolent.geojson',  # TypeError len(ds.unique)
+]
+exts = [
+  '.csv',
+  '.xls',
+  '.xlsx', '.xlsm', '.xltx', '.xltm',
+  '.rds',
+  '.geojson', '.gpkg',
+  '.gdb', '.shp', '.zip',
+]
+
+# COMMAND ----------
+
 import os, json
 from datetime import datetime, timedelta
 import pandas as pd
@@ -138,27 +161,6 @@ def meta2meta(meta):
 
 # COMMAND ----------
 
-# Params
-path_limit = None  # max paths to walk through
-recency_timeout = 1  # min mtime-now in hours
-max_filesize = 10 * 1024**3  # maximum file size in bytes
-refresh = False  # don't check old metadata output
-out = '/dbfs/mnt/labr/DSET/DataQuality'  # adds .json and .csv
-root = '/dbfs/mnt/landingr/General Access/'
-banned = [
-  '/dbfs/mnt/landingr/General Access/EATrialData/HEM_Tool/renv/',  # Unnecessary Data
-  '/dbfs/mnt/landingr/General Access/TheSolent/TheSolent.geojson',  # TypeError len(ds.unique)
-]
-exts = [
-  '.csv',
-  '.xls',
-  '.xlsx', '.xlsm', '.xltx', '.xltm',
-  '.rds',
-  '.geojson', '.gpkg',
-  '.gdb', '.shp', '.zip',
-]
-
-# Main
 meta = json.load(open(out+'.json', 'r')) if os.path.exists(out+'.json') and not refresh else dict()
 paths, exts_skipped = get_paths(root, exts, path_limit, banned)
 fails = []
@@ -185,7 +187,8 @@ for i, path in enumerate(paths, 1):
     meta[path] = m1
 json.dump(meta, open(out+'.json', 'w'))
 
-# CSV Output
+# COMMAND ----------
+
 df = pd.merge(
   pd.json_normalize(meta.copy().values()).drop('COLUMNS', 1),  # file meta
   pd.json_normalize(meta.values(), record_path='COLUMNS', meta='Filepath'),  # column meta
@@ -195,7 +198,8 @@ first_cols = ['Dataset Name', 'Column Name', 'Filepath', 'File Extension', 'File
 df = df[first_cols + [col for col in df if col not in first_cols]]
 df.to_csv(out+'.csv', index=False)
 
-# Output
+# COMMAND ----------
+
 print( f'\nLengths  Paths:{len(paths)}  Meta:{len(meta)}  Fails:{len(fails)}' )
 print( exts_skipped )
 print( *fails, sep='\n' )
