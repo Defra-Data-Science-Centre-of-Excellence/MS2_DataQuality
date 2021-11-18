@@ -259,3 +259,4 @@ pyreadr.write_rds(out+'.rds', df)
 
 print( f'\nLengths  Paths:{len(paths)}  Meta:{len(meta)}  Fails:{len(fails)}' )
 print( exts_skipped, file=open('data/exts.txt', 'w') )
+print( fails, sep='\n', file=open('data/fails.txt', 'w') )
