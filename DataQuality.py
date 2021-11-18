@@ -13,7 +13,7 @@ s3 = root.startswith('s3')
 path_limit = 0  # max paths to walk through
 refresh = False  # don't check old metadata output
 recency_timeout = 1  # min mtime-now in hours
-max_filesize = 1 * 1024**3  # maximum file size in bytes
+max_filesize = 5 * 1024**3  # maximum file size in bytes
 
 banned = [
   '/dbfs/mnt/landingr/General Access/EATrialData/HEM_Tool/renv/',  # Unnecessary Data
