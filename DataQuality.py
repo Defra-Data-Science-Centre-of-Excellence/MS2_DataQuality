@@ -221,6 +221,9 @@ def meta2meta(meta):
 
 # COMMAND ----------
 
+out_root = '/'.join(out.split('/')[:-1])
+if not os.path.exists(out_root):
+  os.mkdir(out_root)
 meta = json.load(open(out+'.json', 'r')) if os.path.exists(out+'.json') and not refresh else dict()
 paths, exts_skipped = get_paths(root, exts, path_limit, banned)
 fails = []
