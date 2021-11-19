@@ -1,11 +1,12 @@
-#remove.packages('htmltools');install.packages('htmltools')
+# remove.packages('htmltools');install.packages(c('sass','bslib','htmltools','shinyWidgets'))
+# file.copy('/dbfs/mnt/labr/DSET/DataQuality.rds', 'data/DataQuality.rds')
+
 library('shiny')
 library('shinyWidgets')
 library('DT')
 library('dplyr')
 
 
-# file.copy('/dbfs/mnt/labr/DSET/DataQuality.rds', 'data/DataQuality.rds')
 data <- readRDS('data/DataQuality.rds')
 colgs <- c('Dataset Meta', 'Column Meta', 'Geometry Meta')
 cols <- list(
