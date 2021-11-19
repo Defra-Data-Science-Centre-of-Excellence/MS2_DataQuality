@@ -8,6 +8,8 @@
 
 root = 's3://s3-ranch-020/'
 out = 'data/DataQuality'  # adds .json and .rds
+#root = '/dbfs/mnt/landingr/General Access/'
+#out = '/dbfs/mnt/labr/DSET/DataQuality'  # adds .json and .rds
 s3 = root.startswith('s3')
 
 path_limit = 0  # max paths to walk through
