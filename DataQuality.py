@@ -241,7 +241,7 @@ for i, path in enumerate(paths, 1):
       raise Exception(f'Recently Modified: {m1["Date Modified"]}')
     df = get_df(path)
   except Exception as e:
-    fails.append((path, e))
+    fails.append((e, path))
   else:
     m1.update(df2meta(df))
     for col in df.columns:
@@ -265,4 +265,4 @@ pyreadr.write_rds(out+'.rds', df)
 
 print( f'\nLengths  Paths:{len(paths)}  Meta:{len(meta)}  Fails:{len(fails)}' )
 print( exts_skipped, file=open(out+'_exts.txt', 'w') )
-print( fails, sep='\n', file=open(out+'_fails.txt', 'w') )
+print( *fails, sep='\n', file=open(out+'_fails.txt', 'w') )
