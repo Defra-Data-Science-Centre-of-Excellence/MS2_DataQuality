@@ -1,5 +1,18 @@
-# remove.packages('htmltools');install.packages(c('sass','bslib','htmltools','shinyWidgets'))
+# remove.packages('htmltools')
+# install.packages(c(
+#   'sass',
+#   'bslib',
+#   'htmltools',
+#   'aws.ec2metadata',
+#   'aws.s3',
+#   'aws.signature',
+#   'plotly',
+#   'shinydashboard',
+#   'shinyjs',
+#   'shinyWidgets'
+# ))
 # file.copy('/dbfs/mnt/labr/DSET/DataQuality.rds', 'data/DataQuality.rds')
+
 
 library('shiny')
 library('shinyWidgets')
