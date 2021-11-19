@@ -5,7 +5,7 @@ library('DT')
 library('dplyr')
 
 
-# file.copy('/dbfs/mnt/labr/DSET/DataQuality.csv', 'data/DataQuality.rds')
+# file.copy('/dbfs/mnt/labr/DSET/DataQuality.rds', 'data/DataQuality.rds')
 data <- readRDS('data/DataQuality.rds')
 colgs <- c('Dataset Meta', 'Column Meta', 'Geometry Meta')
 cols <- list(
