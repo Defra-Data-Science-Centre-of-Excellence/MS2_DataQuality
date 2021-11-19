@@ -7,15 +7,15 @@
 # COMMAND ----------
 
 root = 's3://s3-ranch-020/'
-out = 'data/DataQuality'  # adds .json and .rds
+out = 'data/DataQuality'
 #root = '/dbfs/mnt/landingr/General Access/'
-#out = '/dbfs/mnt/labr/DSET/DataQuality'  # adds .json and .rds
+#out = '/dbfs/mnt/labr/DSET/DataQuality'
 s3 = root.startswith('s3')
 
 path_limit = 0  # max paths to walk through
 refresh = False  # don't check old metadata output
 recency_timeout = 1  # min mtime-now in hours
-max_filesize = 5 * 1024**3  # maximum file size in bytes
+max_filesize = 0 * 1024**3  # maximum file size in bytes
 
 banned = [
   '/dbfs/mnt/landingr/General Access/EATrialData/HEM_Tool/renv/',  # Unnecessary Data
@@ -235,7 +235,7 @@ for i, path in enumerate(paths, 1):
   try:
     if path in meta.keys() and meta[path]['Date Modified'] == m1['Date Modified']:
       raise Exception(f'Not Modified')
-    if max_filesize < m1['File Size (Bytes)']:
+    if max_filesize and max_filesize < m1['File Size (Bytes)']:
       raise Exception(f'Too Large: {m1["File Size (Bytes)"]}')
     if timedelta(hours=recency_timeout) < datetime.fromisoformat(m1['Date Modified']) - datetime.now():
       raise Exception(f'Recently Modified: {m1["Date Modified"]}')
