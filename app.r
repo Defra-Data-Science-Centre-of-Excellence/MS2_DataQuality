@@ -1,15 +1,16 @@
 # remove.packages('htmltools')
 # install.packages(c(
+#   'fastmap',
 #   'sass',
 #   'bslib',
 #   'htmltools',
 #   'aws.ec2metadata',
 #   'aws.s3',
 #   'aws.signature',
-#   'plotly',
-#   'shinydashboard',
-#   'shinyjs',
-#   'shinyWidgets'
+#   'shiny',
+#   'shinyWidgets',
+#   'DT',
+#   'dplyr'
 # ))
 # file.copy('/dbfs/mnt/labr/DSET/DataQuality.rds', 'data/DataQuality.rds', overwrite=T)
 
