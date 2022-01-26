@@ -50,6 +50,7 @@ ui <- {fluidPage(
 
     # Data Qualities
     Discover more about data you're interested in.
+    In direct competition with the [Data Catalogue](https://defra.sharepoint.com/:x:/r/teams/Team1645/_layouts/15/Doc.aspx?sourcedoc=%7Bc1e77bcd-33e6-4f2c-8fc1-b376a92ada75%7D&action=default&uid=%7BC1E77BCD-33E6-4F2C-8FC1-B376A92ADA75%7D&ListItemId=33652&ListId=%7BE5F717E5-2E8B-494C-94AD-D93BD7B6A995%7D&odsp=1&env=prod&cid=53e14f42-0a2a-48c2-89bc-bb70f10c70f6), but much better.
     Contains CDAP data:  /dbfs/mnt/landingr/General Access/
     More information and code on [GitHub](https://github.com/Defra-Data-Science-Centre-of-Excellence/MS2_DataQuality).
 
